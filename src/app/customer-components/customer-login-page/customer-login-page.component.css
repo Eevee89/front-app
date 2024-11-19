@@ -1,0 +1,106 @@
+#topDiv {
+    width: 100%;
+    height: 20%;
+    display: flex;
+    flex-direction: row;
+    background-color: #AAA;
+}
+
+#switch {
+    display: flex;
+    flex-direction: column;
+    width: 10%;
+    height: 100%;
+    background-color: #BBB;
+}
+
+#left, #right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+    width: 100%;
+}
+
+#left {
+    border-bottom: 1px black solid;
+}
+
+#right {
+    border-top: 1px black solid;
+}
+
+#left>p, #right>p {
+    font-size: 1.5rem;
+}
+
+#progressBar {
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+#step1, #step2, #step3 {
+    height: 25%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 5px #BBB solid;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#step1::after, #step2::after, #step3::after {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    width: 200%;
+    height: 100%;
+    bottom: -120%;
+    z-index: 4;
+    text-align: center;
+    font-size: .8rem;
+}
+
+#step1::after {
+    content: 'Vos infos personnelles';
+}
+
+#step2::after {
+    content: 'Choisissez votre centre';
+}
+
+#step3::after {
+    content: 'Résumé de l\'inscription';
+}
+
+#step1>p, #step2>p, #step3>p {
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+#line12, #line23 {
+    width: 25%;
+    height: 5px;
+    background: linear-gradient(to right, #0F0 50%, #BBB 50%) right;
+    background-size: 200%;
+    transition: 1s ease-out;
+}
+
+.completed {
+    background-position: left !important;
+}
+
+.pending {
+    border-color: #FF0 !important;
+    transform: scale(125%);
+    z-index: 2;
+}
+.completed-round {
+    border-color: #0F0 !important;
+}
