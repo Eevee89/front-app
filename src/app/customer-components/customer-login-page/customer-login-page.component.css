@@ -182,6 +182,25 @@
     background-color: #FFA;
 }
 
+.genderInput {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 5px;
+    width: 60%;
+    height: 100%;
+    border-radius: 10px;
+    border: 2px solid transparent;
+}
+
+.filled {
+    background-color: #5F5 !important;
+}
+
+.toFill {
+    background-color: #F55 !important;
+}
 
 @media (min-width: 768px) {
     #step1content {
@@ -190,7 +209,7 @@
         grid-gap: 20px;
     }
 
-    #firstNameInput, #nameInput, #mailPhoneInput {
+    #namesInput, #genderDateInput, #mailPhoneInput {
         grid-column-start: 1;
         grid-column-end: 2;
     }
@@ -199,12 +218,12 @@
         grid-column-start: 2;
     }
 
-    #firstNameInput, #addressInput {
+    #namesInput, #addressInput {
         grid-row-start: 1;
         grid-row-end: 2;
     }
 
-    #nameInput, #zipCityInput {
+    #genderDateInput, #zipCityInput {
         grid-row-start: 2;
         grid-row-end: 3;
     }

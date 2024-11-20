@@ -6,7 +6,7 @@ export interface Patient {
     phone: string;
     email: string;
     addressId: number;
-    birthDate: Date;
+    birthDate?: Date;
     appointmentIds?: number[];
 
 }

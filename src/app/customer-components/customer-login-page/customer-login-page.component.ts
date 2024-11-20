@@ -1,33 +1,65 @@
 import { NgClass, NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { Patient } from '../../../models/patient';
+import { Address } from '../../../models/address';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-customer-login-page',
   standalone: true,
-  imports: [NgIf, NgClass],
+  imports: [NgIf, NgClass, FormsModule],
   templateUrl: './customer-login-page.component.html',
   styleUrl: './customer-login-page.component.css'
 })
 export class CustomerLoginPageComponent {
-  patient?: Patient;
+  showEmpty?: boolean = false;
+
+  patient?: Patient = {
+    id: 1, 
+    firstName: "", 
+    lastName: "", 
+    gender: true, 
+    email: "", 
+    phone: "", 
+    addressId: 1
+  };
+
+  address?: Address = {
+    id: 1,
+    street: "",
+    city: "",
+    zipCode: ""
+  };
 
   step: number = 0;
 
   submit(step: number) {
-    if (step == 1) {
-      let firstName = (document.getElementsByName("firstName")[0] as HTMLInputElement).value ?? "";
-      let lastName = (document.getElementsByName("name")[0] as HTMLInputElement).value ?? "";
-      let email = (document.getElementsByName("email")[0] as HTMLInputElement).value ?? "";
-      let phone = (document.getElementsByName("phone")[0] as HTMLInputElement).value ?? "";
-      this.patient = {id: 1, firstName: firstName, lastName: lastName, gender: false, email: email, phone: phone, birthDate: new Date(), addressId: 1};
-    }
     if (step == 0) {
-      (document.getElementsByName("firstName")[0] as HTMLInputElement).value = this.patient!.firstName;
-      (document.getElementsByName("name")[0] as HTMLInputElement).value = this.patient!.lastName;
-      (document.getElementsByName("email")[0] as HTMLInputElement).value = this.patient!.email;
-      (document.getElementsByName("phone")[0] as HTMLInputElement).value = this.patient!.phone;
+      this.step = step;
     }
-    this.step = step;
+    if (step == 1) {
+      this.showEmpty = true;
+      var patient = this.patient!;
+      if (patient.firstName != '' && patient.lastName != '' && patient.birthDate && this.isValidEmail(patient.email)
+        && this.isValidAddress(this.address!.street) && this.isValidPhoneNumber(patient.phone))
+      {
+        this.step = step;
+      }
+    }
+  }
+
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);  
+  }
+
+  isValidPhoneNumber(phoneNumber: string): boolean {
+    const frenchPhoneNumberRegex = /^0[1-9]([-. ]?[0-9]{2}){4}$/;
+    return frenchPhoneNumberRegex.test(phoneNumber);
+  }
+
+  isValidAddress(address: string): boolean {
+    const addressRegex = /^\d+\s+[A-Za-z\s]+$/;
+    return addressRegex.test(address);
   }
 }

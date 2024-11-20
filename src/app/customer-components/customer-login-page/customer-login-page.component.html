@@ -18,16 +18,31 @@
 </div>
 
 <div id="step1content" *ngIf="step == 0">
-    <div id="firstNameInput" class="inputRow leftColumn"><input name="firstName" type="text" placeholder="Prénom (ex.: John)" /></div>
-    <div id="nameInput" class="inputRow leftColumn"><input name="name" type="text" placeholder="Nom (ex.: Doe)"/></div>
-    <div id="mailPhoneInput" class="inputRow leftColumn">
-        <input class="leftInput" name="mail" type="text" placeholder="Email (ex.: john.doe@fakemail.com)"/>
-        <input class="rightInput" name="mail" type="text" placeholder="Tél. (ex.: 0102030405)"/> 
+    <div id="namesInput" class="inputRow leftColumn">
+        <input class="leftInput" name="firstName" type="text" placeholder="Prénom (ex.: John)" [(ngModel)]="patient!.firstName" [ngClass]="patient!.firstName != '' ? 'filled' : (showEmpty ? 'toFill' : '')"/>
+        <input class="rightInput" name="name" type="text" placeholder="Nom (ex.: Doe)" [(ngModel)]="patient!.lastName" [ngClass]="patient!.lastName != '' ? 'filled' : (showEmpty ? 'toFill' : '')"/>
     </div>
-    <div id="addressInput" class="inputRow rightColumn"><input name="address" type="text" placeholder="Adress (n°+rue) (ex.: 1 Chicken Street)"/></div>
+    <div id="genderDateInput" class="inputRow leftColumn">
+        <div class="genderInput">
+            <div>
+                <input type="radio" id="genderMale" name="genderMale" value="true" [(ngModel)]="patient!.gender"/>
+                <label for="genderMale">Male</label>
+            </div>
+            <div>
+                <input type="radio" id="genderFemale" name="genderFemale" value="false" [(ngModel)]="patient!.gender"/>
+                <label for="genderFemale">Female</label>
+            </div>
+        </div>
+        <input class="rightInput" name="date" type="date" min="1900-01-01" max="2024-12-31" [(ngModel)]="patient!.birthDate" [ngClass]="patient!.birthDate ? 'filled' : (showEmpty ? 'toFill' : '')"/>
+    </div>
+    <div id="mailPhoneInput" class="inputRow leftColumn">
+        <input class="leftInput" name="mail" type="text" placeholder="Email (ex.: john.doe@fakemail.com)" [(ngModel)]="patient!.email" [ngClass]="isValidEmail(patient!.email) ? 'filled' : (showEmpty ? 'toFill' : '')"/>
+        <input class="rightInput" name="mail" type="text" placeholder="Tél. (ex.: 0102030405)" [(ngModel)]="patient!.phone" [ngClass]="isValidPhoneNumber(patient!.phone) ? 'filled' : (showEmpty ? 'toFill' : '')"/> 
+    </div>
+    <div id="addressInput" class="inputRow rightColumn"><input name="address" type="text" placeholder="Adresse (n°+rue) (ex.: 1 Chicken Street)" [(ngModel)]="address!.street" [ngClass]="isValidAddress(address!.street) ? 'filled' : (showEmpty ? 'toFill' : '')"/></div>
     <div id="zipCityInput" class="inputRow rightColumn">
-        <input class="leftInput" name="city" type="text" placeholder="Ville (ex.: Paris)"/>
-        <input class="rightInput" name="zipCode" type="text" placeholder="C. Postal (ex.: 75000)"/>
+        <input class="leftInput" name="city" type="text" placeholder="Ville (ex.: Paris)" [(ngModel)]="address!.city" [ngClass]="address!.city != '' ? 'filled' : (showEmpty ? 'toFill' : '')"/>
+        <input class="rightInput" name="zipCode" type="text" placeholder="C. Postal (ex.: 75000)" [(ngModel)]="address!.zipCode" [ngClass]="address!.zipCode != '' ? 'filled' : (showEmpty ? 'toFill' : '')"/>
     </div>
 
     <div id="confirmInput" class="inputRow rightColumn">
