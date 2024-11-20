@@ -1,9 +1,25 @@
+:root {
+    --sunset: #ffd289ff;
+    --jasmine: #fdcf7aff;
+    --saffron: #facc6bff;
+    --sunglow: #fdcf4eff;
+    --jonquil: #ffd131ff;
+    --saffron-2: #fac530ff;
+    --xanthous: #f5b82eff;
+    --xanthous-2: #f5b230ff;
+    --hunyadi-yellow: #f4ac32ff;
+}
+
+* {
+    cursor: context-menu;
+}
+
 #topDiv {
     width: 100%;
     height: 20%;
     display: flex;
     flex-direction: row;
-    background-color: #AAA;
+    background-color: #f5b230ff;
 }
 
 #switch {
@@ -11,28 +27,31 @@
     flex-direction: column;
     width: 10%;
     height: 100%;
-    background-color: #BBB;
+    background-color: #f5b82eff;
 }
 
-#left, #right {
+#signup, #signin {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 50%;
     width: 100%;
+    cursor: pointer;
 }
 
-#left {
+#signup {
     border-bottom: 1px black solid;
 }
 
-#right {
+#signin {
     border-top: 1px black solid;
 }
 
-#left>p, #right>p {
-    font-size: 1.5rem;
+#signup>p, #signin>p {
+    font-size: 150%;
+    text-align: center;
+    cursor: pointer;
 }
 
 #progressBar {
@@ -48,7 +67,7 @@
     height: 25%;
     aspect-ratio: 1;
     border-radius: 50%;
-    border: 5px #BBB solid;
+    border: 5px #fdcf4eff solid;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -64,7 +83,7 @@
     bottom: -120%;
     z-index: 4;
     text-align: center;
-    font-size: .8rem;
+    font-size: 80%;
 }
 
 #step1::after {
@@ -80,14 +99,14 @@
 }
 
 #step1>p, #step2>p, #step3>p {
-    font-size: 2rem;
+    font-size: 200%;
     font-weight: 500;
 }
 
 #line12, #line23 {
     width: 25%;
     height: 5px;
-    background: linear-gradient(to right, #0F0 50%, #BBB 50%) right;
+    background: linear-gradient(to right, #0F0 50%, #fdcf4eff 50%) right;
     background-size: 200%;
     transition: 1s ease-out;
 }
@@ -103,4 +122,113 @@
 }
 .completed-round {
     border-color: #0F0 !important;
+}
+
+#step1content, #step2content, #step3content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 80%;
+}
+
+.inputRow {
+    width: 30%;
+    height: 5%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#confirmInput {
+    justify-content: center !important;
+}
+
+#valid1 {
+    height: 100% !important;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: #fdcf4eff;
+    padding: 5px;
+    border: #f5b230ff 3px solid;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.inputRow>input {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    background-color: #FFA;
+    padding: 5px;
+    cursor: vertical-text;
+}
+
+.leftInput {
+    width: 60% !important;
+    height: 100%;
+    border-radius: 10px;
+    background-color: #FFA;
+}
+
+.rightInput {
+    width: 30% !important;
+    height: 100%;
+    border-radius: 10px;
+    background-color: #FFA;
+}
+
+
+@media (min-width: 768px) {
+    #step1content {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 20px;
+    }
+
+    #firstNameInput, #nameInput, #mailPhoneInput {
+        grid-column-start: 1;
+        grid-column-end: 2;
+    }
+
+    #addressInput, #zipCityInput, #confirmInput {
+        grid-column-start: 2;
+    }
+
+    #firstNameInput, #addressInput {
+        grid-row-start: 1;
+        grid-row-end: 2;
+    }
+
+    #nameInput, #zipCityInput {
+        grid-row-start: 2;
+        grid-row-end: 3;
+    }
+
+    #mailPhoneInput, #confirmInput {
+        grid-row-start: 3;
+    }
+
+    .inputRow {
+        width: 60%;
+        height: 15%;
+    }
+
+    #valid1 {
+        width: 30%;
+        height: 15%;
+        justify-self: center;
+    }
+
+    .leftColumn {
+        justify-self: end;
+    }
+
+    .rightColumn {
+        justify-self: start;
+    }
 }

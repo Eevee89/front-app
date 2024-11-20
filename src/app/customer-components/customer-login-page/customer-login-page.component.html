@@ -1,15 +1,15 @@
 <div id="topDiv">
     <div id="switch">
-        <div id="left">
+        <div id="signup">
             <p>S'inscrire</p>
         </div>
-        <div id="right">
+        <div id="signin">
             <p>Se connecter</p>
         </div>
     </div>
 
     <div id="progressBar">
-        <div id="step1" [ngClass]="step == 0 ? 'pending' : 'completed-round'"><p>1</p></div>
+        <div id="step1" [ngClass]="step == 0 ? 'pending' : 'completed-round'" (click)="submit(0)"><p>1</p></div>
         <div id="line12" [ngClass]="step == 0 ? '' : 'completed'"></div>
         <div id="step2" [ngClass]="step == 0 ? '' : (step == 1 ? 'pending' : 'completed-round')"><p>2</p></div>
         <div id="line23" [ngClass]="step <= 1 ? '' : 'completed'"></div>
@@ -18,12 +18,21 @@
 </div>
 
 <div id="step1content" *ngIf="step == 0">
-    <input id="firstNameInput" name="firstName" type="text" placeholder="John"/>
-    <input id="nameInput" name="name" type="text" placeholder="Doe"/>
-    <input id="addressInput" name="address" type="text" placeholder="1 Chicken Street"/>
-    <input id="cityInput" name="city" type="text" placeholder="New York"/>
+    <div id="firstNameInput" class="inputRow leftColumn"><input name="firstName" type="text" placeholder="Prénom (ex.: John)" /></div>
+    <div id="nameInput" class="inputRow leftColumn"><input name="name" type="text" placeholder="Nom (ex.: Doe)"/></div>
+    <div id="mailPhoneInput" class="inputRow leftColumn">
+        <input class="leftInput" name="mail" type="text" placeholder="Email (ex.: john.doe@fakemail.com)"/>
+        <input class="rightInput" name="mail" type="text" placeholder="Tél. (ex.: 0102030405)"/> 
+    </div>
+    <div id="addressInput" class="inputRow rightColumn"><input name="address" type="text" placeholder="Adress (n°+rue) (ex.: 1 Chicken Street)"/></div>
+    <div id="zipCityInput" class="inputRow rightColumn">
+        <input class="leftInput" name="city" type="text" placeholder="Ville (ex.: Paris)"/>
+        <input class="rightInput" name="zipCode" type="text" placeholder="C. Postal (ex.: 75000)"/>
+    </div>
 
-    <button id="valid1" (click)="submit(1)">Continuer</button>
+    <div id="confirmInput" class="inputRow rightColumn">
+        <div id="valid1" (click)="submit(1)">Continuer</div>
+    </div>
 </div>
 
 <div id="step2content" *ngIf="step == 1">
