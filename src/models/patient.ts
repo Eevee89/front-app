@@ -8,5 +8,5 @@ export interface Patient {
     addressId: number;
     birthDate?: Date;
     appointmentIds?: number[];
-
+    password?: string;
 }

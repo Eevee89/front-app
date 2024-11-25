@@ -124,7 +124,7 @@
     border-color: #0F0 !important;
 }
 
-#step1content, #step2content, #step3content {
+#step1content, #step2content, #step3content, #signinModal {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -141,11 +141,11 @@
     justify-content: space-between;
 }
 
-#confirmInput {
+#confirmInput, #connectInput {
     justify-content: center !important;
 }
 
-#valid1 {
+#valid1, #connect {
     height: 100% !important;
     display: flex;
     flex-direction: row;
@@ -235,6 +235,11 @@
     .inputRow {
         width: 60%;
         height: 15%;
+    }
+
+    #signinModal>.inputRow {
+        width: 30%;
+        height: 10%;
     }
 
     #valid1 {

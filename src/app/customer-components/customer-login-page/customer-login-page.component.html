@@ -3,7 +3,7 @@
         <div id="signup">
             <p>S'inscrire</p>
         </div>
-        <div id="signin">
+        <div id="signin" (click)="showSigninModal()">
             <p>Se connecter</p>
         </div>
     </div>
@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<div id="step1content" *ngIf="step == 0">
+<div id="step1content" *ngIf="step == 0 && !signin">
     <div id="namesInput" class="inputRow leftColumn">
         <input class="leftInput" name="firstName" type="text" placeholder="Prénom (ex.: John)" [(ngModel)]="patient!.firstName" [ngClass]="patient!.firstName != '' ? 'filled' : (showEmpty ? 'toFill' : '')"/>
         <input class="rightInput" name="name" type="text" placeholder="Nom (ex.: Doe)" [(ngModel)]="patient!.lastName" [ngClass]="patient!.lastName != '' ? 'filled' : (showEmpty ? 'toFill' : '')"/>
@@ -50,10 +50,18 @@
     </div>
 </div>
 
-<div id="step2content" *ngIf="step == 1">
+<div id="step2content" *ngIf="step == 1  && !signin">
     <button id="valid2" (click)="submit(2)">Continuer2</button>
 </div>
 
-<div id="step3content" *ngIf="step == 2">
+<div id="step3content" *ngIf="step == 2  && !signin">
     <button id="valid3" (click)="submit(3)">Continuer3</button>
+</div>
+
+<div id="signinModal" *ngIf="signin" class="modal">
+    <div id="username" class="inputRow"><input name="username" type="text" placeholder="Email (ex.: john.doe@fakemail.com)" [(ngModel)]="patient!.email" [ngClass]="isValidEmail(patient!.email) ? 'filled' : (showEmpty ? 'toFill' : '')"/></div>
+    <div id="username" class="inputRow"><input name="username" type="password" placeholder="Entrez votre mot de passe" [(ngModel)]="patient!.password" [ngClass]="patient!.password ? 'filled' : (showEmpty ? 'toFill' : '')"/></div>
+    <div id="connectInput" class="inputRow rightColumn">
+        <div id="connect" (click)="connect()">Se connecter</div>
+    </div>
 </div>
