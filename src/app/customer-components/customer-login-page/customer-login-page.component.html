@@ -1,1 +1,103 @@
-<p>customer-login-page works!</p>
+<div id="container">
+    <mat-card>
+        <mat-tab-group>
+            <mat-tab label="Se connecter">
+                <div id="pan1">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Email</mat-label>
+                        <input
+                            matInput
+                            placeholder="john.doe@gmail.com"
+                            [formControl]="email"
+                            (blur)="updateErrorMessage()"
+                            required/>
+                            @if (email.invalid) {
+                                <mat-error>{{errorMessage()}}</mat-error>
+                            }
+                    </mat-form-field>
+        
+                    <mat-form-field appearance="outline">
+                        <mat-label>Mot de passe</mat-label>
+                        <input matInput [type]="hide() ? 'password' : 'text'" />
+                        <button
+                            mat-icon-button
+                            matSuffix
+                            (click)="clickEvent($event)"
+                            [attr.aria-label]="'Hide password'"
+                            [attr.aria-pressed]="hide()">
+                            <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        </button>
+                    </mat-form-field>
+
+                    <a mat-button href="customer/index">Confirmer</a>
+                </div>
+            </mat-tab>
+            <mat-tab label="S'inscrire">
+                <div id="pan2">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Prénom</mat-label>
+                        <input matInput placeholder="Placeholder">
+                    </mat-form-field>
+        
+                    <mat-form-field appearance="outline">
+                        <mat-label>Nom</mat-label>
+                        <input matInput placeholder="Placeholder">
+                    </mat-form-field>
+    
+                    <mat-form-field appearance="outline">
+                        <mat-label>Email</mat-label>
+                        <input
+                            matInput
+                            placeholder="john.doe@gmail.com"
+                            [formControl]="email"
+                            (blur)="updateErrorMessage()"
+                            required/>
+                            @if (email.invalid) {
+                                <mat-error>{{errorMessage()}}</mat-error>
+                            }
+                    </mat-form-field>
+        
+                    <mat-form-field appearance="outline">
+                        <mat-label>Téléphone</mat-label>
+                        <input matInput placeholder="Placeholder">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Date de naissance (DD/MM/YYYY)</mat-label>
+                        <input matInput [matDatepicker]="picker">
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Mot de passe</mat-label>
+                        <input matInput [type]="hide() ? 'password' : 'text'" />
+                        <button
+                            mat-icon-button
+                            matSuffix
+                            (click)="clickEvent($event)"
+                            [attr.aria-label]="'Hide password'"
+                            [attr.aria-pressed]="hide()">
+                            <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        </button>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Conf. mot de passe</mat-label>
+                        <input matInput [type]="hide() ? 'password' : 'text'" />
+                        <button
+                            mat-icon-button
+                            matSuffix
+                            (click)="clickEvent($event)"
+                            [attr.aria-label]="'Hide password'"
+                            [attr.aria-pressed]="hide()">
+                            <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        </button>
+                    </mat-form-field>
+
+                    <a mat-button href="customer/index">Confirmer</a>
+                </div>
+            </mat-tab>
+        </mat-tab-group>      
+    </mat-card>
+</div>

@@ -1,0 +1,53 @@
+
+<div id="main">
+    <mat-toolbar color="primary">
+        <span>Bienvenue [Nom du patient]</span>
+    </mat-toolbar>
+    <mat-form-field appearance="outline">
+        <mat-label>Chercher une ville</mat-label>
+        <mat-select>
+            <input (keyup)="onKey($event.target!)">
+            <mat-option>Aucune</mat-option>
+            <mat-option *ngFor="let city of selectedCities" [value]="city">{{city}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <button
+        mat-icon-button
+        matSuffix
+        [attr.aria-label]="'Hide password'">
+        <mat-icon>search</mat-icon>
+    </button>
+    <mat-card>
+        <img alt="Not found" src="googlemaps.jpeg"/>
+    </mat-card>
+
+    <div id="selectedCenterInfo">
+        <span>Centre sélectionné</span>
+        <span>Maison de santé 21000 Dijon</span>
+        <span>1 rue de l'Hôpital</span>
+    </div>
+
+    <span>Prendre RDV</span>
+
+    <div id="timeSelectors">
+        <mat-form-field id="dateSel" appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="picker">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field id="hourSel" appearance="outline">
+            <mat-label>HH</mat-label>
+            <mat-select>
+                <mat-option *ngFor="let number of [].constructor(24); let i = index " [value]="i">{{i}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field id="minSel" appearance="outline">
+            <mat-label>MM</mat-label>
+            <mat-select>
+                <mat-option *ngFor="let number of [].constructor(60); let i = index " [value]="i">{{i}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>
+
