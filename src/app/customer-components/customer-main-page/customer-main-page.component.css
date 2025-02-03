@@ -1,0 +1,37 @@
+mat-card {
+    width: 90%;
+}
+
+img {
+    border-radius: inherit; /* Inherit border-radius from the mat-card */
+    width: 100%; /* Make the image fill the card width */
+    height: auto; /* Maintain aspect ratio */
+    object-fit: cover;
+}
+
+#selectedCenterInfo {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+#timeSelectors {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    justify-content: space-around;
+}
+
+#dateSel {
+    width: 50%;
+}
+
+#hourSel, #minSel {
+    width: 20%;
+}
+
+@media (min-width: 780px) {
+    mat-card {
+        width: 50%;
+    }
+}

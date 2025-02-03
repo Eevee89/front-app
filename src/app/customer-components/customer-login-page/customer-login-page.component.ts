@@ -1,18 +1,44 @@
 import { NgClass, NgIf } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Patient } from '../../../models/patient';
 import { Address } from '../../../models/address';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
   selector: 'app-customer-login-page',
   standalone: true,
-  imports: [NgIf, NgClass, FormsModule],
+  providers: [provideNativeDateAdapter()],
+  imports: [NgIf, NgClass, 
+    FormsModule, 
+    ReactiveFormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatTabsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatDatepickerModule
+  ],
   templateUrl: './customer-login-page.component.html',
-  styleUrl: './customer-login-page.component.css'
+  styleUrl: './customer-login-page.component.css',
 })
 export class CustomerLoginPageComponent {
+  hide = signal(true);
+  errorMessage = signal('');
+  clickEvent(event: MouseEvent) {
+    this.hide.set(!this.hide());
+    event.stopPropagation();
+  }
+
   showEmpty?: boolean = false;
 
   signin?: boolean = false;
@@ -35,6 +61,8 @@ export class CustomerLoginPageComponent {
   };
 
   step: number = 0;
+
+  readonly email = new FormControl('', [Validators.required, Validators.email]);
 
   constructor(private router: Router){}
 
@@ -77,5 +105,15 @@ export class CustomerLoginPageComponent {
 
   showSigninModal(): void {
     this.signin = true;
+  }
+
+  updateErrorMessage() {
+    if (this.email.hasError('required')) {
+      this.errorMessage.set('You must enter a value');
+    } else if (this.email.hasError('email')) {
+      this.errorMessage.set('Not a valid email');
+    } else {
+      this.errorMessage.set('');
+    }
   }
 }

@@ -1,67 +1,103 @@
-<div id="topDiv">
-    <div id="switch">
-        <div id="signup">
-            <p>S'inscrire</p>
-        </div>
-        <div id="signin" (click)="showSigninModal()">
-            <p>Se connecter</p>
-        </div>
-    </div>
+<div id="container">
+    <mat-card>
+        <mat-tab-group>
+            <mat-tab label="Se connecter">
+                <div id="pan1">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Email</mat-label>
+                        <input
+                            matInput
+                            placeholder="john.doe@gmail.com"
+                            [formControl]="email"
+                            (blur)="updateErrorMessage()"
+                            required/>
+                            @if (email.invalid) {
+                                <mat-error>{{errorMessage()}}</mat-error>
+                            }
+                    </mat-form-field>
+        
+                    <mat-form-field appearance="outline">
+                        <mat-label>Mot de passe</mat-label>
+                        <input matInput [type]="hide() ? 'password' : 'text'" />
+                        <button
+                            mat-icon-button
+                            matSuffix
+                            (click)="clickEvent($event)"
+                            [attr.aria-label]="'Hide password'"
+                            [attr.aria-pressed]="hide()">
+                            <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        </button>
+                    </mat-form-field>
 
-    <div id="progressBar">
-        <div id="step1" [ngClass]="step == 0 ? 'pending' : 'completed-round'" (click)="submit(0)"><p>1</p></div>
-        <div id="line12" [ngClass]="step == 0 ? '' : 'completed'"></div>
-        <div id="step2" [ngClass]="step == 0 ? '' : (step == 1 ? 'pending' : 'completed-round')"><p>2</p></div>
-        <div id="line23" [ngClass]="step <= 1 ? '' : 'completed'"></div>
-        <div id="step3" [ngClass]="step <= 1 ? '' : (step == 2 ? 'pending' : 'completed-round')"><p>3</p></div>
-    </div>
-</div>
+                    <a mat-button href="customer/index">Confirmer</a>
+                </div>
+            </mat-tab>
+            <mat-tab label="S'inscrire">
+                <div id="pan2">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Prénom</mat-label>
+                        <input matInput placeholder="Placeholder">
+                    </mat-form-field>
+        
+                    <mat-form-field appearance="outline">
+                        <mat-label>Nom</mat-label>
+                        <input matInput placeholder="Placeholder">
+                    </mat-form-field>
+    
+                    <mat-form-field appearance="outline">
+                        <mat-label>Email</mat-label>
+                        <input
+                            matInput
+                            placeholder="john.doe@gmail.com"
+                            [formControl]="email"
+                            (blur)="updateErrorMessage()"
+                            required/>
+                            @if (email.invalid) {
+                                <mat-error>{{errorMessage()}}</mat-error>
+                            }
+                    </mat-form-field>
+        
+                    <mat-form-field appearance="outline">
+                        <mat-label>Téléphone</mat-label>
+                        <input matInput placeholder="Placeholder">
+                    </mat-form-field>
 
-<div id="step1content" *ngIf="step == 0 && !signin">
-    <div id="namesInput" class="inputRow leftColumn">
-        <input class="leftInput" name="firstName" type="text" placeholder="Prénom (ex.: John)" [(ngModel)]="patient!.firstName" [ngClass]="patient!.firstName != '' ? 'filled' : (showEmpty ? 'toFill' : '')"/>
-        <input class="rightInput" name="name" type="text" placeholder="Nom (ex.: Doe)" [(ngModel)]="patient!.lastName" [ngClass]="patient!.lastName != '' ? 'filled' : (showEmpty ? 'toFill' : '')"/>
-    </div>
-    <div id="genderDateInput" class="inputRow leftColumn">
-        <div class="genderInput">
-            <div>
-                <input type="radio" id="genderMale" name="genderMale" value="true" [(ngModel)]="patient!.gender"/>
-                <label for="genderMale">Male</label>
-            </div>
-            <div>
-                <input type="radio" id="genderFemale" name="genderFemale" value="false" [(ngModel)]="patient!.gender"/>
-                <label for="genderFemale">Female</label>
-            </div>
-        </div>
-        <input class="rightInput" name="date" type="date" min="1900-01-01" max="2024-12-31" [(ngModel)]="patient!.birthDate" [ngClass]="patient!.birthDate ? 'filled' : (showEmpty ? 'toFill' : '')"/>
-    </div>
-    <div id="mailPhoneInput" class="inputRow leftColumn">
-        <input class="leftInput" name="mail" type="text" placeholder="Email (ex.: john.doe@fakemail.com)" [(ngModel)]="patient!.email" [ngClass]="isValidEmail(patient!.email) ? 'filled' : (showEmpty ? 'toFill' : '')"/>
-        <input class="rightInput" name="mail" type="text" placeholder="Tél. (ex.: 0102030405)" [(ngModel)]="patient!.phone" [ngClass]="isValidPhoneNumber(patient!.phone) ? 'filled' : (showEmpty ? 'toFill' : '')"/> 
-    </div>
-    <div id="addressInput" class="inputRow rightColumn"><input name="address" type="text" placeholder="Adresse (n°+rue) (ex.: 1 Chicken Street)" [(ngModel)]="address!.street" [ngClass]="isValidAddress(address!.street) ? 'filled' : (showEmpty ? 'toFill' : '')"/></div>
-    <div id="zipCityInput" class="inputRow rightColumn">
-        <input class="leftInput" name="city" type="text" placeholder="Ville (ex.: Paris)" [(ngModel)]="address!.city" [ngClass]="address!.city != '' ? 'filled' : (showEmpty ? 'toFill' : '')"/>
-        <input class="rightInput" name="zipCode" type="text" placeholder="C. Postal (ex.: 75000)" [(ngModel)]="address!.zipCode" [ngClass]="address!.zipCode != '' ? 'filled' : (showEmpty ? 'toFill' : '')"/>
-    </div>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Date de naissance (DD/MM/YYYY)</mat-label>
+                        <input matInput [matDatepicker]="picker">
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
 
-    <div id="confirmInput" class="inputRow rightColumn">
-        <div id="valid1" (click)="submit(1)">Continuer</div>
-    </div>
-</div>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Mot de passe</mat-label>
+                        <input matInput [type]="hide() ? 'password' : 'text'" />
+                        <button
+                            mat-icon-button
+                            matSuffix
+                            (click)="clickEvent($event)"
+                            [attr.aria-label]="'Hide password'"
+                            [attr.aria-pressed]="hide()">
+                            <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        </button>
+                    </mat-form-field>
 
-<div id="step2content" *ngIf="step == 1  && !signin">
-    <button id="valid2" (click)="submit(2)">Continuer2</button>
-</div>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Conf. mot de passe</mat-label>
+                        <input matInput [type]="hide() ? 'password' : 'text'" />
+                        <button
+                            mat-icon-button
+                            matSuffix
+                            (click)="clickEvent($event)"
+                            [attr.aria-label]="'Hide password'"
+                            [attr.aria-pressed]="hide()">
+                            <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        </button>
+                    </mat-form-field>
 
-<div id="step3content" *ngIf="step == 2  && !signin">
-    <button id="valid3" (click)="submit(3)">Continuer3</button>
-</div>
-
-<div id="signinModal" *ngIf="signin" class="modal">
-    <div id="username" class="inputRow"><input name="username" type="text" placeholder="Email (ex.: john.doe@fakemail.com)" [(ngModel)]="patient!.email" [ngClass]="isValidEmail(patient!.email) ? 'filled' : (showEmpty ? 'toFill' : '')"/></div>
-    <div id="username" class="inputRow"><input name="username" type="password" placeholder="Entrez votre mot de passe" [(ngModel)]="patient!.password" [ngClass]="patient!.password ? 'filled' : (showEmpty ? 'toFill' : '')"/></div>
-    <div id="connectInput" class="inputRow rightColumn">
-        <div id="connect" (click)="connect()">Se connecter</div>
-    </div>
+                    <a mat-button href="customer/index">Confirmer</a>
+                </div>
+            </mat-tab>
+        </mat-tab-group>      
+    </mat-card>
 </div>
