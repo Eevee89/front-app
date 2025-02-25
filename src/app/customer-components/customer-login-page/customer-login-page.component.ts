@@ -12,6 +12,8 @@ import { MatInputModule } from '@angular/material/input';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { HttpClient } from '@angular/common/http';
+import fs from 'fs';
 
 @Component({
   selector: 'app-customer-login-page',
@@ -26,7 +28,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatDatepickerModule
+    MatDatepickerModule,
   ],
   templateUrl: './customer-login-page.component.html',
   styleUrl: './customer-login-page.component.css',
@@ -63,8 +65,9 @@ export class CustomerLoginPageComponent {
   step: number = 0;
 
   readonly email = new FormControl('', [Validators.required, Validators.email]);
+  readonly password = new FormControl('', [Validators.required]);
 
-  constructor(private router: Router){}
+  constructor(private router: Router, private _httpClient: HttpClient){}
 
   submit(step: number) {
     if (step == 0) {
@@ -115,5 +118,23 @@ export class CustomerLoginPageComponent {
     } else {
       this.errorMessage.set('');
     }
+  }
+
+  async loginClick() {
+    console.info("Calling API");
+    /*let resp: Patient[] = [];
+    await this._httpClient.get<Patient[]>('/api/patients').subscribe(response => {
+      resp = response;
+      console.table(resp);
+    });
+
+    this.router.navigate(["customer/index"]);*/
+    let user = {
+      email: this.email.value,
+      password: this.password.value
+    };
+
+    localStorage.setItem('userData', JSON.stringify(user));
+    this.router.navigate(["customer/index"]);
   }
 }
