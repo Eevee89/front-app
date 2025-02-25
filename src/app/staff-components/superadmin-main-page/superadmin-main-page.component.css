@@ -1,0 +1,109 @@
+#selectedCenterInfo {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+#timeSelectors {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    justify-content: space-around;
+}
+
+#dateSel {
+    width: 50%;
+}
+
+#hourSel, #minSel {
+    width: 20%;
+}
+
+@media (min-width: 780px) {
+    mat-card {
+        width: 50%;
+    }
+}
+
+#main {
+    padding: 5px;
+}
+
+#main mat-toolbar {
+    margin-bottom: 20px;
+}
+
+#main mat-form-field {
+    width: 300px;
+    margin: 20px 0;
+}
+
+#mainTabGroup {
+    margin-top: 5px;
+}
+
+#medecinInfoTabGroup {
+    margin-top: 5px;
+}
+
+#main #selectedMedecinInfo,
+#main #selectedCenterInfo {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+#main #selectedMedecinInfo span,
+#main #selectedCenterInfo span, 
+#main #centerDoctorsList{
+    display: block;
+    margin-bottom: 10px;
+}
+
+#main #reservationsInfo {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+#main #reservationsInfo h3 {
+    margin-bottom: 15px;
+}
+
+#main #noAction {
+    margin-left: 20px;
+}
+
+.reservation-details {
+    margin-top: 20px;
+}
+
+.reservation-details h4 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.info-group {
+    margin-bottom: 20px;
+}
+
+.info-group h5 {
+    color: #666;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.info-group p {
+    margin: 5px 0;
+    color: #333;
+}
+
+mat-card {
+    margin-top: 15px;
+}
+
+mat-card-content {
+    padding: 15px;
+}

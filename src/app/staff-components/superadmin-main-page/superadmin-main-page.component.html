@@ -1,0 +1,72 @@
+<div id="main">
+    <mat-toolbar color="primary">
+        <span>Super Administrateur</span>
+    </mat-toolbar>
+
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex">
+        <mat-tab label="Gestion des centres">
+            <mat-form-field appearance="outline">
+                <mat-label>Rechercher un centre</mat-label>
+                <input matInput placeholder="Nom du centre">
+                <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+
+            <mat-tab-group>
+                <mat-tab label="Informations centre">
+                    <div id="selectedCenterInfo">
+                        <span>Centre sélectionné<br></span>
+                        <span>Nom du centre : <br></span>
+                        <span>Adresse : <br></span>
+                        <span>Ville : <br></span>
+                        <span>Code postal : <br></span>
+                        <span>Téléphone : <br></span>
+                        <span>Email : <br></span>
+                    </div>
+                </mat-tab>
+                
+                <mat-tab label="Liste des médecins">
+                    <div id="centerDoctorsList">
+                        <span>Médecins du centre<br></span>
+                        <!-- Liste des médecins ici -->
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </mat-tab>
+
+        <mat-tab label="Gestion des administrateurs">
+            <div id="adminInfo"> 
+                <h3>Gestion des administrateurs</h3>
+                
+                <mat-form-field appearance="outline">
+                    <mat-label>Rechercher un administrateur</mat-label>
+                    <input matInput placeholder="Nom de l'administrateur">
+                    <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+
+                <div class="admin-details" *ngIf="selectedAdmin">
+                    <h4>Détails de l'administrateur</h4>
+                    <mat-card>
+                        <mat-card-content>
+                            <div class="info-group">
+                                <h5>Informations personnelles</h5>
+                                <p>Nom : </p>
+                                <p>Prénom : </p>
+                                <p>Email : </p>
+                                <p>Téléphone :</p>
+                            </div>
+
+                            <div class="info-group">
+                                <h5>Centre médical géré</h5>
+                                <p>Nom du centre :</p>
+                                <p>Adresse :</p>
+                                <p>Ville :</p>
+                                <p>Code postal : </p>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</div>
+

@@ -1,0 +1,86 @@
+<div id="main">
+    <mat-toolbar color="primary">
+        <span>Administrateur</span>
+    </mat-toolbar>
+
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex">
+        <mat-tab label="Gestion des médecins">
+            <mat-form-field appearance="outline">
+                <mat-label>Rechercher un médecin</mat-label>
+                <input matInput placeholder="Nom du médecin">
+                <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+
+            <mat-tab-group>
+                <mat-tab label="Informations médecin">
+                    <div id="selectedMedecinInfo">
+                        <span>Medecin sélectionné<br></span>
+                        <span>Nom : <br></span>
+                        <span>Prénom : <br></span>
+                        <span>Spécialité : <br></span>
+                        <span>Numéro de téléphone : <br></span>
+                        <span>Email : <br></span>
+                    </div>
+                </mat-tab>
+                
+                <mat-tab label="Informations centre">
+                    <div id="selectedCenterInfo">
+                        <span>Centre sélectionné<br></span>
+                        <span>Nom du centre : <br></span>
+                        <span>Adresse : <br></span>
+                        <span>Ville : <br></span>
+                        <span>Code postal : <br></span>
+                        <span>Téléphone : <br></span>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </mat-tab>
+
+        <mat-tab label="Gestion des réservations">
+            <div id="reservationsInfo"> 
+                <h3>Gestion des réservations</h3>
+                
+                <mat-form-field appearance="outline">
+                    <mat-label>Rechercher un patient</mat-label>
+                    <input matInput placeholder="Nom du patient">
+                    <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+
+                <div class="reservation-details" *ngIf="selectedPatient">
+                    <h4>Détails de la réservation</h4>
+                    <mat-card>
+                        <mat-card-content>
+                            <div class="info-group">
+                                <h5>Patient</h5>
+                                <p>Nom : </p>
+                                <p>Prénom : </p>
+                                <p>Téléphone : </p>
+                            </div>
+
+                            <div class="info-group">
+                                <h5>Rendez-vous</h5>
+                                <p>Date : {{selectedReservation?.appointmentDate | date:'dd/MM/yyyy'}}</p>
+                                <p>Heure de début : {{selectedReservation?.startTime}}</p>
+                                <p>Heure de fin : {{selectedReservation?.endTime}}</p>
+                            </div>
+
+                            <div class="info-group">
+                                <h5>Médecin</h5>
+                                <p>Dr. {{selectedReservation?.medecin?.lastName}} {{selectedReservation?.medecin?.firstName}}</p>
+                                <p>Spécialité : </p>
+                            </div>
+
+                            <div class="info-group">
+                                <h5>Centre médical</h5>
+                                <p>adresse</p>
+                                <p>ville</p>
+                                <p>code postal</p>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</div>
+
