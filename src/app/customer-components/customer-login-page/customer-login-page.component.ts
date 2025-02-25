@@ -1,5 +1,5 @@
 import { NgClass, NgIf } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { Patient } from '../../../models/patient';
 import { Address } from '../../../models/address';
 import { Router } from '@angular/router';
@@ -9,11 +9,12 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { HttpClient } from '@angular/common/http';
-import fs from 'fs';
+import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs'; 
 
 @Component({
   selector: 'app-customer-login-page',
@@ -69,6 +70,8 @@ export class CustomerLoginPageComponent {
 
   constructor(private router: Router, private _httpClient: HttpClient){}
 
+  private _snackBar = inject(MatSnackBar);
+
   submit(step: number) {
     if (step == 0) {
       this.step = step;
@@ -121,20 +124,25 @@ export class CustomerLoginPageComponent {
   }
 
   async loginClick() {
-    console.info("Calling API");
-    /*let resp: Patient[] = [];
-    await this._httpClient.get<Patient[]>('/api/patients').subscribe(response => {
-      resp = response;
-      console.table(resp);
-    });
+    try {
+      let user = {
+        email: this.email.value,
+        password: this.password.value,
+      };
 
-    this.router.navigate(["customer/index"]);*/
-    let user = {
-      email: this.email.value,
-      password: this.password.value
-    };
+      localStorage.setItem('userData', JSON.stringify(user));
+      await firstValueFrom(this._httpClient.get('/api/auth'));
 
-    localStorage.setItem('userData', JSON.stringify(user));
-    this.router.navigate(["customer/index"]);
+      this.router.navigate(["customer/index"]);
+    } catch (error) {
+      if (error instanceof HttpErrorResponse) {
+        if (error.status === HttpStatusCode.Unauthorized) {
+          let snackBarRef = this._snackBar.open(
+            'Les informations fournies n\'ont pas permis de vous identifier.', '',
+            { duration: 3000 }
+          );
+        }
+      }
+    }
   }
 }
