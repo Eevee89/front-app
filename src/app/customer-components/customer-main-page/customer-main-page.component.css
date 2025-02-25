@@ -1,37 +1,88 @@
+#main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 mat-card {
     width: 90%;
 }
 
 img {
-    border-radius: inherit; /* Inherit border-radius from the mat-card */
-    width: 100%; /* Make the image fill the card width */
-    height: auto; /* Maintain aspect ratio */
+    border-radius: inherit;
+    width: 100%;
+    height: auto;
     object-fit: cover;
 }
 
 #selectedCenterInfo {
     display: flex;
     flex-direction: column;
+    justify-items: flex-start;
     padding: 10px;
 }
 
-#timeSelectors {
+#timeSelectorsPhone {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    width: calc(100% - 20px);
     padding: 10px;
     justify-content: space-around;
+    align-items: center;
+}
+
+#timeSelectorsDesktop {
+    display: none;
 }
 
 #dateSel {
-    width: 50%;
+    width: 90%;
+}
+
+#subtime, #searchBar {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around;
+}
+
+
+#searchBar {
+    padding-top: 20px;
+}
+
+#searchIcon {
+    transform: scale(2);
 }
 
 #hourSel, #minSel {
-    width: 20%;
+    width: 45%;
 }
-
 @media (min-width: 780px) {
     mat-card {
+        width: 20%;
+    }
+
+    #searchForm {
         width: 50%;
+    }
+
+    #timeSelectorsDesktop {
+        display: flex;
+        flex-direction: row;
+        padding: 10px;
+        justify-content: space-around;
+    }
+
+    #timeSelectorsPhone {
+        display: none;
+    }
+
+    #dateSel {
+        width: 50%;
+    }
+    
+    #hourSel, #minSel {
+        width: 20%;
     }
 }
