@@ -3,26 +3,29 @@
         <mat-tab-group>
             <mat-tab label="Se connecter">
                 <div id="pan1">
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="topField">
                         <mat-label>Email</mat-label>
                         <input
                             matInput
                             placeholder="john.doe@gmail.com"
                             [formControl]="email"
-                            (blur)="updateErrorMessage()"
+                            (blur)="updateEmailErrorMessage()"
                             required/>
                             @if (email.invalid) {
-                                <mat-error>{{errorMessage()}}</mat-error>
+                                <mat-error>{{emailErrorMessage()}}</mat-error>
                             }
                     </mat-form-field>
         
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline"  class="botField">
                         <mat-label>Mot de passe</mat-label>
                         <input 
                             matInput [type]="hide() ? 'password' : 'text'" 
                             [formControl]="password"
                             required
                         />
+                        @if (password.invalid) {
+                            <mat-error>Vous ne pouvez pas laisser ce champ vide</mat-error>
+                        }
                         <button
                             mat-icon-button
                             matSuffix
@@ -33,50 +36,126 @@
                         </button>
                     </mat-form-field>
 
-                    <a mat-button (click)="loginClick()">Confirmer</a>
-                    <!--<a mat-button href="customer/index">Confirmer</a>-->
+                    <a mat-button (click)="loginClick()">Se connecter</a>
                 </div>
             </mat-tab>
             <mat-tab label="S'inscrire">
                 <div id="pan2">
-                    <mat-form-field appearance="outline">
+                    <mat-radio-group aria-label="Select an option" class="topField" [(ngModel)]="gender">
+                        <mat-radio-button value="M">Monsieur</mat-radio-button>
+                        <mat-radio-button value="F">Madame</mat-radio-button>
+                    </mat-radio-group>
+                
+                    <mat-form-field appearance="outline" class="midField">
                         <mat-label>Prénom</mat-label>
-                        <input matInput placeholder="Placeholder">
+                        <input 
+                            matInput 
+                            placeholder="John"
+                            [formControl]="firstName"
+                            required>
+                            @if (firstName.invalid) {
+                                <mat-error>Vous ne pouvez pas laisser ce champ vide</mat-error>
+                            }
                     </mat-form-field>
         
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="midField">
                         <mat-label>Nom</mat-label>
-                        <input matInput placeholder="Placeholder">
+                        <input 
+                            matInput 
+                            placeholder="Doe"
+                            [formControl]="lastName"
+                            required>
+                            @if (lastName.invalid) {
+                                <mat-error>Vous ne pouvez pas laisser ce champ vide</mat-error>
+                            }
                     </mat-form-field>
     
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="midField">
                         <mat-label>Email</mat-label>
                         <input
                             matInput
                             placeholder="john.doe@gmail.com"
                             [formControl]="email"
-                            (blur)="updateErrorMessage()"
+                            (blur)="updateEmailErrorMessage()"
                             required/>
                             @if (email.invalid) {
-                                <mat-error>{{errorMessage()}}</mat-error>
+                                <mat-error>{{emailErrorMessage()}}</mat-error>
                             }
                     </mat-form-field>
         
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="midField">
                         <mat-label>Téléphone</mat-label>
-                        <input matInput placeholder="Placeholder">
+                        <input 
+                            matInput 
+                            placeholder="0102030405"
+                            [formControl]="phone"
+                            (blur)="updatePhoneErrorMessage()"
+                            required>
+                            @if (phone.invalid) {
+                                <mat-error>{{phoneErrorMessage()}}</mat-error>
+                            }
                     </mat-form-field>
 
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="midField">
                         <mat-label>Date de naissance (DD/MM/YYYY)</mat-label>
-                        <input matInput [matDatepicker]="picker">
+                        <input 
+                            matInput 
+                            [matDatepicker]="picker"
+                            [formControl]="birthDate"
+                            required>
+                            @if (birthDate.invalid) {
+                                <mat-error>Vous ne pouvez pas laisser ce champ vide</mat-error>
+                            }
                         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                         <mat-datepicker #picker></mat-datepicker>
                     </mat-form-field>
 
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="midField">
+                        <mat-label>Adresse</mat-label>
+                        <input 
+                            matInput 
+                            placeholder="1 Rue des abricots"
+                            [formControl]="street"
+                            required>
+                            @if (street.invalid) {
+                                <mat-error>Vous ne pouvez pas laisser ce champ vide</mat-error>
+                            }
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="midField">
+                        <mat-label>Code postal</mat-label>
+                        <input 
+                            matInput 
+                            placeholder="75000"
+                            [formControl]="zipCode"
+                            required>
+                            @if (zipCode.invalid) {
+                                <mat-error>Vous ne pouvez pas laisser ce champ vide</mat-error>
+                            }
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="midField">
+                        <mat-label>Ville</mat-label>
+                        <input 
+                            matInput 
+                            placeholder="Paris"
+                            [formControl]="city"
+                            required>
+                            @if (city.invalid) {
+                                <mat-error>Vous ne pouvez pas laisser ce champ vide</mat-error>
+                            }
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="midField">
                         <mat-label>Mot de passe</mat-label>
-                        <input matInput [type]="hide() ? 'password' : 'text'" />
+                        <input 
+                            matInput [type]="hide() ? 'password' : 'text'" 
+                            [formControl]="password"
+                            required
+                        />
+                        @if (password.invalid) {
+                            <mat-error>Vous ne pouvez pas laisser ce champ vide</mat-error>
+                        }
                         <button
                             mat-icon-button
                             matSuffix
@@ -87,9 +166,16 @@
                         </button>
                     </mat-form-field>
 
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="botField">
                         <mat-label>Conf. mot de passe</mat-label>
-                        <input matInput [type]="hide() ? 'password' : 'text'" />
+                        <input 
+                            matInput [type]="hide() ? 'password' : 'text'" 
+                            [formControl]="confPassword"
+                            required
+                        />
+                        @if (confPassword.invalid) {
+                            <mat-error>Vous ne pouvez pas laisser ce champ vide</mat-error>
+                        }
                         <button
                             mat-icon-button
                             matSuffix
@@ -99,9 +185,9 @@
                             <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
                         </button>
                     </mat-form-field>
-
-                    <!--<a mat-button href="customer/index">Confirmer</a>-->
-                    <a mat-button (click)="loginClick()">Confirmer</a>
+                </div>
+                <div id="btnCont">
+                    <a mat-button (click)="signupClick()">S'inscrire</a>
                 </div>
             </mat-tab>
         </mat-tab-group>      

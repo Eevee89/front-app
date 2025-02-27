@@ -7,15 +7,43 @@
     align-items: center;
 }
 
+mat-card {
+    width: 90%;
+    max-height: 90%;
+}
+
 #pan1, #pan2 {
-    display:flex;
-    flex-direction:column;
-    justify-content:space-around;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
     padding: 10px;
 }
 
-mat-card {
-    width: 90%;
+#pan2 {
+    max-height: 64%;
+    overflow: auto;
+}
+
+.topField, .midField {
+    margin-bottom: 5px;
+}
+
+.botField, .midField {
+    margin-top: 5px;
+}
+
+#btnCont {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    justify-content: center;
+}
+
+mat-radio-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }
 
 @media (min-width: 780px) {
