@@ -46,6 +46,8 @@ export class CustomerMainPageComponent {
 
   selectedCities = this.cities; 
 
+  name: string = localStorage.getItem("userName")!;
+
   constructor(private router: Router, private _httpClient: HttpClient){}
 
   async ngOnInit() {

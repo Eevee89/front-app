@@ -1,4 +1,3 @@
-import { NgClass, NgIf } from '@angular/common';
 import { Component, signal, inject } from '@angular/core';
 import { Patient } from '../../../models/patient';
 import { Address } from '../../../models/address';
@@ -21,7 +20,7 @@ import { firstValueFrom } from 'rxjs';
   selector: 'app-customer-login-page',
   standalone: true,
   providers: [provideNativeDateAdapter()],
-  imports: [NgIf, NgClass, 
+  imports: [
     FormsModule, 
     ReactiveFormsModule,
     MatCardModule,
@@ -46,12 +45,6 @@ export class CustomerLoginPageComponent {
     event.stopPropagation();
   }
 
-  showEmpty?: boolean = false;
-
-  signin?: boolean = false;
-
-  step: number = 0;
-
   gender: string = "M";
 
   readonly email = new FormControl('', [Validators.required, Validators.email]);
@@ -68,47 +61,6 @@ export class CustomerLoginPageComponent {
   constructor(private router: Router, private _httpClient: HttpClient){}
 
   private _snackBar = inject(MatSnackBar);
-
-  /*submit(step: number) {
-    if (step == 0) {
-      this.step = step;
-    }
-    if (step == 1) {
-      this.showEmpty = true;
-      var patient = this.patient!;
-      if (patient.firstName != '' && patient.lastName != '' && patient.birthDate && this.isValidEmail(patient.email)
-        && this.isValidAddress(this.address!.street) && this.isValidPhoneNumber(patient.phone))
-      {
-        this.step = step;
-      }
-    }
-  }*/
-
-  connect() {
-    // Call endpoint
-    // Redirect
-    console.log("ICI");
-    this.router.navigate(["customer/index"]);
-  }
-
-  isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);  
-  }
-
-  isValidPhoneNumber(phoneNumber: string): boolean {
-    const frenchPhoneNumberRegex = /^0[1-9]([-. ]?[0-9]{2}){4}$/;
-    return frenchPhoneNumberRegex.test(phoneNumber);
-  }
-
-  isValidAddress(address: string): boolean {
-    const addressRegex = /^\d+\s+[A-Za-z\s]+$/;
-    return addressRegex.test(address);
-  }
-
-  showSigninModal(): void {
-    this.signin = true;
-  }
 
   updateEmailErrorMessage() {
     if (this.email.hasError('required')) {
@@ -138,10 +90,16 @@ export class CustomerLoginPageComponent {
       };
 
       localStorage.setItem('userData', JSON.stringify(user));
-      await firstValueFrom(this._httpClient.get('/api/auth'));
+      let resp = JSON.stringify(await firstValueFrom(this._httpClient.get('/api/auth')));
+      resp = resp.substring(9);
+      const n = resp.length;
+      resp = resp.substring(0, n-2);
+
+      localStorage.setItem('userName', resp);
 
       this.router.navigate(["customer/index"]);
     } catch (error) {
+      console.log(error);
       if (error instanceof HttpErrorResponse) {
         if (error.status === HttpStatusCode.Unauthorized) {
           this._snackBar.open(
@@ -155,10 +113,10 @@ export class CustomerLoginPageComponent {
 
   async signupClick() {
     try {
-      if (/*!this.firstName.value || !this.lastName.value || !this.email.value 
+      if (!this.firstName.value || !this.lastName.value || !this.email.value 
         || !this.phone.value || !this.birthDate.value
-        ||*/ !this.street.value || !this.zipCode.value || !this.city.value
-        /*|| !this.password.value || !this.confPassword.value*/) {
+        || !this.street.value || !this.zipCode.value || !this.city.value
+        || !this.password.value || !this.confPassword.value) {
         this._snackBar.open(
           'Il manque des données vous concernant', undefined,
           { duration: 3000 }
@@ -172,8 +130,8 @@ export class CustomerLoginPageComponent {
       }
       else {
         let user = {
-          email: this.email.value,
-          password: this.password.value,
+          email: this.email.value!,
+          password: this.password.value!,
         };
 
         let toAddaddress: {
@@ -214,12 +172,12 @@ export class CustomerLoginPageComponent {
         };
 
         localStorage.setItem('user', JSON.stringify(patient));
+        localStorage.setItem('userName', this.firstName.value!);
         await firstValueFrom(this._httpClient.post('/api/patients/create', patient))
   
-        //this.router.navigate(["customer/index"]);
+        this.router.navigate(["customer/index"]);
       }
     } catch (error) {
-      console.log(error);
       if (error instanceof HttpErrorResponse) {
         if (error.status === HttpStatusCode.Unauthorized) {
           this._snackBar.open(
