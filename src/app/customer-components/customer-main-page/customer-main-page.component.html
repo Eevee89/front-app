@@ -1,22 +1,17 @@
 
 <div id="main">
     <mat-toolbar color="primary">
-        <span>Bienvenue [Nom du patient]</span>
+        <span>Bienvenue {{name}}</span>
     </mat-toolbar>
     <div id="searchBar">
         <mat-form-field id="searchForm" appearance="outline">
             <mat-label>Chercher une ville</mat-label>
-            <mat-select>
+            <mat-select (selectionChange)="onSelect($event.value)">
                 <input (keyup)="onKey($event.target!)">
-                <mat-option>Aucune</mat-option>
-                <mat-option *ngFor="let city of selectedCities" [value]="city">{{city}}</mat-option>
+                <mat-option [value]="-1">Aucune</mat-option>
+                <mat-option *ngFor="let city of filteredCities; let i = index" [value]="i">{{ city }}</mat-option>
             </mat-select>
         </mat-form-field>
-        <button
-            mat-icon-button
-            matSuffix>
-            <mat-icon id="searchIcon">search</mat-icon>
-        </button>
     </div>
     <mat-card>
         <img alt="Not found" src="googlemaps.jpeg"/>
@@ -24,16 +19,16 @@
 
     <div id="selectedCenterInfo">
         <span><h3>Centre sélectionné</h3></span>
-        <span>Maison de santé</span>
-        <span>21000 Dijon</span>
-        <span>1 rue de l'Hôpital</span>
+        <span>{{ selectedCenter!.name }}</span>
+        <span>{{ selectedCenter!.address.zipCode + " " + selectedCenter!.address.city }}</span>
+        <span>{{ selectedCenter!.address.street }}</span>
     </div>
 
     <div id="timeSelectorsPhone">
         <div>
             <mat-form-field id="dateSel" appearance="outline">
                 <mat-label>Date</mat-label>
-                <input matInput [matDatepicker]="picker">
+                <input matInput [matDatepicker]="picker" [formControl]="date">
                 <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
@@ -41,14 +36,14 @@
         <div id="subtime">
             <mat-form-field id="hourSel" appearance="outline">
                 <mat-label>Heures</mat-label>
-                <mat-select>
-                    <mat-option *ngFor="let number of [].constructor(24); let i = index " [value]="i">{{i}}</mat-option>
+                <mat-select [(value)]="hour" (selectionChange)="onSelectTime($event.value, 'hour')">
+                    <mat-option *ngFor="let i of getRange('hour')" [value]="i">{{i}}</mat-option>
                 </mat-select>
             </mat-form-field>
             <mat-form-field id="minSel" appearance="outline">
                 <mat-label>Minutes</mat-label>
-                <mat-select>
-                    <mat-option *ngFor="let number of [].constructor(60); let i = index " [value]="i">{{i}}</mat-option>
+                <mat-select [(value)]="mins" (selectionChange)="onSelectTime($event.value, 'mins')">
+                    <mat-option *ngFor="let i of getRange('mins')" [value]="i">{{i}}</mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
@@ -56,21 +51,26 @@
 
     <div id="timeSelectorsDesktop">
         <mat-form-field id="dateSel" appearance="outline">
-            <mat-label>Date</mat-label>
-            <input matInput [matDatepicker]="picker">
+            <mat-label>Date du RDV</mat-label>
+            <input 
+                matInput 
+                [matDatepicker]="picker"
+                [formControl]="date"
+                [value]="date.value"
+                required>
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
         <mat-form-field id="hourSel" appearance="outline">
             <mat-label>Heures</mat-label>
-            <mat-select>
-                <mat-option *ngFor="let number of [].constructor(24); let i = index " [value]="i">{{i}}</mat-option>
+            <mat-select [(value)]="hour" (selectionChange)="onSelectTime($event.value, 'hour')">
+                <mat-option *ngFor="let i of getRange('hour')" [value]="i">{{i}}</mat-option>
             </mat-select>
         </mat-form-field>
         <mat-form-field id="minSel" appearance="outline">
             <mat-label>Minutes</mat-label>
-            <mat-select>
-                <mat-option *ngFor="let number of [].constructor(60); let i = index " [value]="i">{{i}}</mat-option>
+            <mat-select [(value)]="mins" (selectionChange)="onSelectTime($event.value, 'mins')">
+                <mat-option *ngFor="let i of getRange('mins')" [value]="i">{{i}}</mat-option>
             </mat-select>
         </mat-form-field>
     </div>
@@ -78,7 +78,8 @@
     <button
         mat-raised-button
         matSuffix
-        (click)="testClick()">
+        [disabled]="selectedCenter.id == -1"
+        (click)="book()">
         <span>Prendre RDV</span>
     </button>
 </div>

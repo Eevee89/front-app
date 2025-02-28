@@ -1,7 +1,10 @@
+import { Patient } from './patient';
+import { Staff } from './staff';
+import { Center } from './center';
+
 export interface Appointment {
-    id: number;
-    patientId: number;
-    centerId: number;
-    doctorId: number;
-    date: Date;
+    patientId: Patient;
+    centerId: Center;
+    doctorId: Staff;
+    time: Date;
 }
