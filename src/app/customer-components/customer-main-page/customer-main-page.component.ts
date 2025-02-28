@@ -183,6 +183,11 @@ export class CustomerMainPageComponent {
 
     try {
       await firstValueFrom(this._httpClient.post('/api/appointments/create', app));
+
+      this._snackBar.open(
+        'Le rendez-vous a été enregistré avec succès.', '',
+        { duration: 3000 }
+      );
     } catch (error) {
       if (error instanceof HttpErrorResponse) {
         if (error.status === HttpStatusCode.Unauthorized) {

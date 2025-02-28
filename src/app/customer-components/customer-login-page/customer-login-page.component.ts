@@ -61,6 +61,10 @@ export class CustomerLoginPageComponent {
 
   private _snackBar = inject(MatSnackBar);
 
+  async ngOnInit() {
+    localStorage.clear();
+  }
+
   updateEmailErrorMessage() {
     if (this.email.hasError('required')) {
       this.emailErrorMessage.set('Vous ne pouvez pas laisser ce champ vide');
