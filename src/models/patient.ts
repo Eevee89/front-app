@@ -1,6 +1,7 @@
 import { Address } from './address';
 
 export interface Patient {
+    id: number,
     firstName: string;
     lastName: string;
     gender: boolean;

@@ -1,5 +1,4 @@
 import { Component, signal, inject } from '@angular/core';
-import { Patient } from '../../../models/patient';
 import { Address } from '../../../models/address';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -160,7 +159,7 @@ export class CustomerLoginPageComponent {
           zipCode: toAddaddress.zipCode
         };
 
-        let patient: Patient = {
+        let patient = {
           firstName: this.firstName.value!, 
           lastName: this.lastName.value!, 
           gender: this.gender == "M", 
