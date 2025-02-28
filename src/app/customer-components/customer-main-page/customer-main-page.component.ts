@@ -26,7 +26,7 @@ import { firstValueFrom } from 'rxjs';
   selector: 'app-customer-main-page',
   standalone: true,
   providers: [provideNativeDateAdapter()],
-  imports: [NgIf, NgClass, NgForOf,
+  imports: [NgForOf,
     FormsModule, 
     ReactiveFormsModule,
     MatCardModule,
@@ -184,7 +184,6 @@ export class CustomerMainPageComponent {
     try {
       await firstValueFrom(this._httpClient.post('/api/appointments/create', app));
     } catch (error) {
-      console.log(error);
       if (error instanceof HttpErrorResponse) {
         if (error.status === HttpStatusCode.Unauthorized) {
           this._snackBar.open(

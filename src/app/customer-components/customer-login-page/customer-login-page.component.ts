@@ -86,6 +86,7 @@ export class CustomerLoginPageComponent {
       let user = {
         email: this.email.value,
         password: this.password.value,
+        role: "USER"
       };
 
       localStorage.setItem('userData', JSON.stringify(user));
@@ -98,7 +99,6 @@ export class CustomerLoginPageComponent {
 
       this.router.navigate(["customer/index"]);
     } catch (error) {
-      console.log(error);
       if (error instanceof HttpErrorResponse) {
         if (error.status === HttpStatusCode.Unauthorized) {
           this._snackBar.open(
@@ -131,6 +131,7 @@ export class CustomerLoginPageComponent {
         let user = {
           email: this.email.value!,
           password: this.password.value!,
+          role: "USER"
         };
 
         let toAddaddress: {
