@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
 import { CustomerLoginPageComponent } from './customer-components/customer-login-page/customer-login-page.component';
-import { StaffLoginPageComponent } from './staff-components/staff-login-page/staff-login-page.component';
+import { StaffLoginPageComponent } from './customer-components/login-page/login-page.component';
 import { CustomerMainPageComponent } from './customer-components/customer-main-page/customer-main-page.component';
-import { MedecinMainPageComponent } from './staff-components/medecin-main-page/medecin-main-page.component';
-import { AdminMainPageComponent } from './staff-components/admin-main-page/admin-main-page.component';
-import { SuperAdminMainPageComponent } from './staff-components/superadmin-main-page/superadmin-main-page.component';
+import { MedecinMainPageComponent } from './customer-components/medecin-main-page/medecin-main-page.component';
+import { AdminMainPageComponent } from './customer-components/admin-main-page/admin-main-page.component';
+import { SuperAdminMainPageComponent } from './customer-components/superadmin-main-page/superadmin-main-page.component';
 
 export const routes: Routes = [
     { path: "login/customers", component: CustomerLoginPageComponent},

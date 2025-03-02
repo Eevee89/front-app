@@ -33,8 +33,8 @@ import { MatSelectModule } from '@angular/material/select';
     MatDatepickerModule,
     MatSelectModule
   ],
-  templateUrl: './staff-login-page.component.html',
-  styleUrl: './staff-login-page.component.css',
+  templateUrl: './login-page.component.html',
+  styleUrl: './login-page.component.css',
 })
 export class StaffLoginPageComponent {
   hide = signal(true);
@@ -98,38 +98,36 @@ export class StaffLoginPageComponent {
         return;
       }
 
+      // Conversion du rôle sélectionné (Patient/Staff) vers le rôle API (USER/STAFF)
+      const apiRole = this.role.value === 'Patient' ? 'USER' : 'STAFF';
+
       let staff = {
         email: this.email.value,
         password: this.password.value,
-        role: this.role.value
+        role: apiRole
       };
 
       localStorage.setItem('staffData', JSON.stringify(staff));
       
-      let resp = JSON.stringify(await firstValueFrom(this._httpClient.get('/api/auth')));
-      resp = resp.substring(9);
-      const n = resp.length;
-      resp = resp.substring(0, n-2);
+      let response = await firstValueFrom(this._httpClient.get('/api/auth')) as { role: string; name: string };
 
-      localStorage.setItem('staffName', resp);
-
-      // Redirection basée sur le rôle
-      switch (this.role.value) {
-        case 'MEDECIN':
-          this.router.navigate(["/medecin/index"]);
-          break;
-        case 'ADMIN':
-          this.router.navigate(["/admin/index"]);
-          break;
-        case 'SUPER_ADMIN':
-          this.router.navigate(["/super-admin/index"]);
-          break;
-        default:
-          this._snackBar.open(
-            'Rôle non reconnu', '',
-            { duration: 3000 }
-          );
-          break;
+      if (apiRole === 'USER') {
+        localStorage.setItem('staffName', response.name);
+        this.router.navigate(["/customer/index"]);
+      } else if (apiRole === 'STAFF') {
+        const staffRole = response.role.toLowerCase();
+        localStorage.setItem('staffRole', staffRole);
+        this.router.navigate([`/${staffRole}/index`]);
+      } else {
+        this._snackBar.open(
+          'Rôle invalide', '',
+          { duration: 3000 }
+        );
+        throw new HttpErrorResponse({
+          error: 'Invalid role',
+          status: HttpStatusCode.BadRequest,
+          statusText: 'Bad Request'
+        });
       }
 
     } catch (error) {
@@ -149,7 +147,7 @@ export class StaffLoginPageComponent {
       if (!this.firstName.value || !this.lastName.value || !this.email.value 
         || !this.phone.value || !this.birthDate.value
         || !this.street.value || !this.zipCode.value || !this.city.value
-        || !this.password.value || !this.confPassword.value || !this.role.value) {
+        || !this.password.value || !this.confPassword.value) {
         this._snackBar.open(
           'Il manque des données vous concernant', undefined,
           { duration: 3000 }
@@ -165,7 +163,7 @@ export class StaffLoginPageComponent {
         let staff = {
           email: this.email.value!,
           password: this.password.value!,
-          role: this.role.value!
+          role: 'USER'
         };
 
         let toAddaddress: {
@@ -203,33 +201,14 @@ export class StaffLoginPageComponent {
           birthDate: new Date(this.birthDate.value ? this.birthDate.value : "01/01/1970"), 
           address: address,
           password: this.password.value!,
-          role: this.role.value!
+          role: 'USER'
         };
 
         localStorage.setItem('staffMember', JSON.stringify(staffMember));
         localStorage.setItem('staffName', this.firstName.value!);
         
-        // Création du staff member avec le rôle approprié
         await firstValueFrom(this._httpClient.post('/api/staff/create', staffMember));
-
-        // Redirection basée sur le rôle
-        switch (this.role.value) {
-          case 'MEDECIN':
-            this.router.navigate(["/medecin/index"]);
-            break;
-          case 'ADMIN':
-            this.router.navigate(["/admin/index"]);
-            break;
-          case 'SUPER_ADMIN':
-            this.router.navigate(["/super-admin/index"]);
-            break;
-          default:
-            this._snackBar.open(
-              'Rôle non reconnu', '',
-              { duration: 3000 }
-            );
-            break;
-        }
+        this.router.navigate(["/user/index"]);
       }
     } catch (error) {
       if (error instanceof HttpErrorResponse) {
