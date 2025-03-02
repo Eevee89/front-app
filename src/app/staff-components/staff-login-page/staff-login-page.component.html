@@ -1,1 +1,124 @@
-<p>admin-login-page works!</p>
+<div id="container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Connexion Staff</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+            <mat-tab-group>
+                <mat-tab label="Connexion">
+                    <div id="pan1">
+                        <mat-form-field appearance="outline" class="topField">
+                            <mat-label>Email</mat-label>
+                            <input matInput [formControl]="email" required (keyup)="updateEmailErrorMessage()">
+                            <mat-error>{{emailErrorMessage()}}</mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="midField">
+                            <mat-label>Mot de passe</mat-label>
+                            <input matInput [formControl]="password" [type]="hide() ? 'password' : 'text'" required>
+                            <button mat-icon-button matSuffix (click)="hide.set(!hide())" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide()">
+                                <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            </button>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="botField">
+                            <mat-label>Rôle</mat-label>
+                            <mat-select [formControl]="role" required>
+                                <mat-option value="MEDECIN">Médecin</mat-option>
+                                <mat-option value="ADMIN">Administrateur</mat-option>
+                                <mat-option value="SUPER_ADMIN">Super Administrateur</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div id="btnCont">
+                        <button mat-raised-button color="primary" (click)="loginClick()" 
+                                [disabled]="!email.valid || !password.valid || !role.valid">
+                            Se connecter
+                        </button>
+                    </div>
+                </mat-tab>
+                
+                <mat-tab label="Inscription">
+                    <div id="pan2">
+                        <mat-radio-group [(ngModel)]="gender" class="midField">
+                            <mat-radio-button value="M">Homme</mat-radio-button>
+                            <mat-radio-button value="F">Femme</mat-radio-button>
+                        </mat-radio-group>
+
+                        <mat-form-field appearance="outline" class="topField">
+                            <mat-label>Prénom</mat-label>
+                            <input matInput [formControl]="firstName" required>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="midField">
+                            <mat-label>Nom</mat-label>
+                            <input matInput [formControl]="lastName" required>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="midField">
+                            <mat-label>Email</mat-label>
+                            <input matInput [formControl]="email" required (keyup)="updateEmailErrorMessage()">
+                            <mat-error>{{emailErrorMessage()}}</mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="midField">
+                            <mat-label>Téléphone</mat-label>
+                            <input matInput [formControl]="phone" required (keyup)="updatePhoneErrorMessage()">
+                            <mat-error>{{phoneErrorMessage()}}</mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="midField">
+                            <mat-label>Date de naissance</mat-label>
+                            <input matInput [matDatepicker]="picker" [formControl]="birthDate" required>
+                            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="midField">
+                            <mat-label>Rue</mat-label>
+                            <input matInput [formControl]="street" required>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="midField">
+                            <mat-label>Code postal</mat-label>
+                            <input matInput [formControl]="zipCode" required>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="midField">
+                            <mat-label>Ville</mat-label>
+                            <input matInput [formControl]="city" required>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="midField">
+                            <mat-label>Mot de passe</mat-label>
+                            <input matInput [type]="hide() ? 'password' : 'text'" [formControl]="password" required>
+                            <button mat-icon-button matSuffix (click)="hide.set(!hide())" type="button">
+                                <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            </button>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="midField">
+                            <mat-label>Confirmer le mot de passe</mat-label>
+                            <input matInput [type]="hide() ? 'password' : 'text'" [formControl]="confPassword" required>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="botField">
+                            <mat-label>Rôle</mat-label>
+                            <mat-select [formControl]="role" required>
+                                <mat-option value="MEDECIN">Médecin</mat-option>
+                                <mat-option value="ADMIN">Administrateur</mat-option>
+                                <mat-option value="SUPER_ADMIN">Super Administrateur</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div id="btnCont">
+                            <button mat-raised-button color="primary" (click)="signupClick()">S'inscrire</button>
+                        </div>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </mat-card-content>
+    </mat-card>
+</div>
