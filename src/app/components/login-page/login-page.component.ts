@@ -13,10 +13,11 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { MatRadioModule } from '@angular/material/radio';
-import { firstValueFrom } from 'rxjs'; 
+import { firstValueFrom } from 'rxjs';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
-  selector: 'app-customer-login-page',
+  selector: 'app-login-page',
   standalone: true,
   providers: [provideNativeDateAdapter()],
   imports: [
@@ -30,11 +31,12 @@ import { firstValueFrom } from 'rxjs';
     MatInputModule,
     MatIconModule,
     MatDatepickerModule,
+    MatSelectModule
   ],
-  templateUrl: './customer-login-page.component.html',
-  styleUrl: './customer-login-page.component.css',
+  templateUrl: './login-page.component.html',
+  styleUrl: './login-page.component.css',
 })
-export class CustomerLoginPageComponent {
+export class LoginPageComponent {
   hide = signal(true);
   emailErrorMessage = signal('');
   phoneErrorMessage = signal('');
@@ -56,6 +58,7 @@ export class CustomerLoginPageComponent {
   readonly city = new FormControl('', [Validators.required]);
   readonly phone = new FormControl('', [Validators.required, Validators.maxLength(10)]);
   readonly confPassword = new FormControl('', [Validators.required]);
+  readonly role = new FormControl('', [Validators.required]);
 
   constructor(private router: Router, private _httpClient: HttpClient){}
 
@@ -87,21 +90,46 @@ export class CustomerLoginPageComponent {
 
   async loginClick() {
     try {
-      let user = {
+      if (!this.email.value || !this.password.value || !this.role.value) {
+        this._snackBar.open(
+          'Veuillez remplir tous les champs', '',
+          { duration: 3000 }
+        );
+        return;
+      }
+
+      // Conversion du rôle sélectionné (Patient/Staff) vers le rôle API (USER/STAFF)
+      const apiRole = this.role.value === 'Patient' ? 'USER' : 'STAFF';
+
+      let staff = {
         email: this.email.value,
         password: this.password.value,
-        role: "USER"
+        role: apiRole
       };
 
-      localStorage.setItem('userData', JSON.stringify(user));
-      let resp = JSON.stringify(await firstValueFrom(this._httpClient.get('/api/auth')));
-      resp = resp.substring(9);
-      const n = resp.length;
-      resp = resp.substring(0, n-2);
+      localStorage.setItem('staffData', JSON.stringify(staff));
+      
+      let response = await firstValueFrom(this._httpClient.get('/api/auth')) as { role: string; name: string };
 
-      localStorage.setItem('userName', resp);
+      if (apiRole === 'USER') {
+        localStorage.setItem('staffName', response.name);
+        this.router.navigate(["/customer/index"]);
+      } else if (apiRole === 'STAFF') {
+        const staffRole = response.role.toLowerCase();
+        localStorage.setItem('staffRole', staffRole);
+        this.router.navigate([`/${staffRole}/index`]);
+      } else {
+        this._snackBar.open(
+          'Rôle invalide', '',
+          { duration: 3000 }
+        );
+        throw new HttpErrorResponse({
+          error: 'Invalid role',
+          status: HttpStatusCode.BadRequest,
+          statusText: 'Bad Request'
+        });
+      }
 
-      this.router.navigate(["customer/index"]);
     } catch (error) {
       if (error instanceof HttpErrorResponse) {
         if (error.status === HttpStatusCode.Unauthorized) {
@@ -132,10 +160,10 @@ export class CustomerLoginPageComponent {
         );
       }
       else {
-        let user = {
+        let staff = {
           email: this.email.value!,
           password: this.password.value!,
-          role: "USER"
+          role: 'USER'
         };
 
         let toAddaddress: {
@@ -150,7 +178,7 @@ export class CustomerLoginPageComponent {
           city: this.city.value!,
         };
 
-        localStorage.setItem('userData', JSON.stringify(user));
+        localStorage.setItem('staffData', JSON.stringify(staff));
         
         let resp = JSON.stringify(await firstValueFrom(this._httpClient.post('/api/address/create', toAddaddress)));
         resp = resp.substring(6);
@@ -164,7 +192,7 @@ export class CustomerLoginPageComponent {
           zipCode: toAddaddress.zipCode
         };
 
-        let patient = {
+        let staffMember = {
           firstName: this.firstName.value!, 
           lastName: this.lastName.value!, 
           gender: this.gender == "M", 
@@ -172,14 +200,15 @@ export class CustomerLoginPageComponent {
           phone: this.phone.value!,
           birthDate: new Date(this.birthDate.value ? this.birthDate.value : "01/01/1970"), 
           address: address,
-          password: this.password.value!
+          password: this.password.value!,
+          role: 'USER'
         };
 
-        localStorage.setItem('user', JSON.stringify(patient));
-        localStorage.setItem('userName', this.firstName.value!);
-        await firstValueFrom(this._httpClient.post('/api/patients/create', patient))
-  
-        this.router.navigate(["customer/index"]);
+        localStorage.setItem('staffMember', JSON.stringify(staffMember));
+        localStorage.setItem('staffName', this.firstName.value!);
+        
+        await firstValueFrom(this._httpClient.post('/api/staff/create', staffMember));
+        this.router.navigate(["/user/index"]);
       }
     } catch (error) {
       if (error instanceof HttpErrorResponse) {
