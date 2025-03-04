@@ -16,6 +16,12 @@ import { MatRadioModule } from '@angular/material/radio';
 import { firstValueFrom } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 
+interface AuthResponse {
+  name: string;
+  privilegeLevel?: number;
+  isStaff: boolean;
+}
+
 @Component({
   selector: 'app-login-page',
   standalone: true,
@@ -97,23 +103,41 @@ export class LoginPageComponent {
       let user = {
         email: this.email.value,
         password: this.password.value,
-        role: "USER"
+        role: "USER"  // On commence avec USER par défaut
       };
+
+      let resp = await firstValueFrom(this._httpClient.get<AuthResponse>('/api/auth', {
+        headers: {
+          'Custom-Auth': JSON.stringify(user)
+        }
+      }));
 
       if (isPlatformBrowser(this.platformId)) {
         localStorage.setItem('userData', JSON.stringify(user));
+        localStorage.setItem('userName', resp.name);
+        
+        if (resp.isStaff && resp.privilegeLevel !== undefined) {
+          localStorage.setItem('privilegeLevel', resp.privilegeLevel.toString());
+          
+          // Redirection en fonction du niveau de privilège pour les staffs
+          switch (resp.privilegeLevel) {
+            case 0:
+              this.router.navigate(["/superadmin/index"]);
+              break;
+            case 1:
+              this.router.navigate(["/admin/index"]);
+              break;
+            case 2:
+              this.router.navigate(["/medecin/index"]);
+              break;
+            default:
+              this._snackBar.open('Niveau de privilège non reconnu', '', { duration: 3000 });
+          }
+        } else {
+          // Si ce n'est pas un staff, c'est un utilisateur normal
+          this.router.navigate(["/customer/index"]);
+        }
       }
-      
-      let resp = JSON.stringify(await firstValueFrom(this._httpClient.get('/api/auth')));
-      resp = resp.substring(9);
-      const n = resp.length;
-      resp = resp.substring(0, n-2);
-
-      if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('userName', resp);
-      }
-
-      this.router.navigate(["customer/index"]);
     } catch (error) {
       if (error instanceof HttpErrorResponse) {
         if (error.status === HttpStatusCode.Unauthorized) {

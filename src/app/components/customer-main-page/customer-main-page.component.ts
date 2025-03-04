@@ -1,5 +1,5 @@
 import { NgClass, NgForOf, NgIf } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { Patient } from '../../../models/patient';
 import { Address } from '../../../models/address';
 import { Center } from '../../../models/center';
@@ -20,7 +20,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Appointment } from '../../../models/appointment';
 import { Staff } from '../../../models/staff';
-import { firstValueFrom } from 'rxjs'; 
+import { firstValueFrom } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-customer-main-page',
@@ -63,18 +64,37 @@ export class CustomerMainPageComponent {
     staffIds: []
   };
 
-  name: string = localStorage.getItem("userName")!;
+  name: string = '';
 
   date = new FormControl;
   readonly testMin = new FormControl('', [Validators.required]);
   hour: number = 8;
   mins: number = 0;
 
-  constructor(private router: Router, private _httpClient: HttpClient){}
+  constructor(private router: Router, private _httpClient: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {}
 
   private _snackBar = inject(MatSnackBar);
 
+  getUserData() {
+    if (isPlatformBrowser(this.platformId)) {
+      const userDataStr = localStorage.getItem('userData');
+      return userDataStr ? JSON.parse(userDataStr) : null;
+    }
+    return null;
+  }
+
+  getUserName() {
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem('userName');
+    }
+    return null;
+  }
+
   async ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.name = localStorage.getItem("userName") || '';
+    }
+    
     await this._httpClient.get<Center[]>('/api/centers').subscribe(response => {
       this.centers = response;
       this.filteredCities = this.search("");
@@ -124,7 +144,10 @@ export class CustomerMainPageComponent {
       this.mins = 0;
     }
     this.date = new FormControl(defaultDate);
-}
+
+    const userData = this.getUserData();
+    const userName = this.getUserName();
+  }
 
   onKey(event: EventTarget) { 
     let searchValue = (event as HTMLTextAreaElement).value ?? "";

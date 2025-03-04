@@ -1,7 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Patient } from '../../../models/patient';
 import { Appointment } from '../../../models/appointment';
@@ -12,11 +10,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { FormsModule } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Staff } from '../../../models/staff';
 import { Center } from '../../../models/center';
 import { MatListModule } from '@angular/material/list';
+import { isPlatformBrowser } from '@angular/common';
 
 interface Reservation {
     appointmentDate: string;
@@ -45,7 +43,7 @@ interface Reservation {
         MatListModule
     ]
 })
-export class MedecinMainPageComponent {
+export class MedecinMainPageComponent implements OnInit {
     selectedTabIndex: number = 0;
     selectedPatient: Patient | null = null;
     selectedReservation: Reservation | null = null;
@@ -55,6 +53,7 @@ export class MedecinMainPageComponent {
     searchControl = new FormControl('');
     filteredPatients: Patient[] = [];
     patientAppointments: Appointment[] = [];
+    patients: Patient[] = [];  // Ajout de la liste des patients
 
     // Nouvelles propriétés pour la validation
     validationSearchControl = new FormControl('');
@@ -63,7 +62,41 @@ export class MedecinMainPageComponent {
     lotNumberControl = new FormControl('');
     commentsControl = new FormControl('');
 
-    constructor(private http: HttpClient) {
+    constructor(
+        private http: HttpClient,
+        @Inject(PLATFORM_ID) private platformId: Object
+    ) {}
+
+    ngOnInit() {
+        let userData = '';
+        if (isPlatformBrowser(this.platformId)) {
+            const rawUserData = localStorage.getItem('userData') || '{}';
+            const parsedUserData = JSON.parse(rawUserData);
+            // Forcer le rôle STAFF indépendamment de ce qui est stocké
+            parsedUserData.role = "STAFF";
+            userData = JSON.stringify(parsedUserData);
+            // Mettre à jour le localStorage avec le nouveau rôle
+            localStorage.setItem('userData', userData);
+            console.log('Données envoyées:', userData);
+        }
+        
+        this.http.get<Patient[]>('http://localhost:8080/api/patient', {
+            headers: {
+                'Custom-Auth': userData
+            }
+        }).subscribe(
+            data => {
+                this.patients = data;
+                console.log("Patients chargés :", this.patients);
+            },
+            error => {
+                console.error("Erreur détaillée:", error);
+                if (error.status === 401) {
+                    console.log("Données d'authentification:", userData);
+                }
+            }
+        );
+
         // Écouter les changements dans le champ de recherche
         this.searchControl.valueChanges.subscribe(value => {
             if (value && value.length >= 2) {
@@ -83,18 +116,51 @@ export class MedecinMainPageComponent {
         });
     }
 
-    private searchPatients(query: string) {
-        this.http.get<Patient[]>(`/api/patients/search?name=${query}`).subscribe(
-            patients => {
-                this.filteredPatients = patients;
+    searchPatients(value: string) {
+        const searchValue = value.trim().toLowerCase();
+        if (!searchValue) {
+            this.filteredPatients = [];
+            return;
+        }
+
+        // Appeler l'API de recherche au lieu de filtrer localement
+        this.http.get<Patient[]>(`http://localhost:8080/api/search`, {
+            params: { name: [searchValue] },
+            headers: {
+                'Custom-Auth': localStorage.getItem('userData') || ''
+            }
+        }).subscribe(
+            data => {
+                this.filteredPatients = data;
+                console.log("Patients trouvés :", this.filteredPatients);
+            },
+            error => {
+                console.error("Erreur de recherche :", error);
+                this.filteredPatients = [];
             }
         );
     }
 
-    private searchPatientsForValidation(query: string) {
-        this.http.get<Patient[]>(`/api/patients/search?name=${query}`).subscribe(
-            patients => {
-                this.filteredPatientsValidation = patients;
+    searchPatientsForValidation(value: string) {
+        const searchValue = value.trim().toLowerCase();
+        if (!searchValue) {
+            this.filteredPatientsValidation = [];
+            return;
+        }
+
+        // Utiliser la même API de recherche
+        this.http.get<Patient[]>(`http://localhost:8080/api/search`, {
+            params: { name: [searchValue] },
+            headers: {
+                'Custom-Auth': localStorage.getItem('userData') || ''
+            }
+        }).subscribe(
+            data => {
+                this.filteredPatientsValidation = data;
+            },
+            error => {
+                console.error("Erreur de recherche :", error);
+                this.filteredPatientsValidation = [];
             }
         );
     }
@@ -102,7 +168,11 @@ export class MedecinMainPageComponent {
     selectPatient(patient: Patient) {
         this.selectedPatient = patient;
         // Charger les rendez-vous du patient
-        this.http.get<Appointment[]>(`/api/appointments/patient/${patient.id}`).subscribe(
+        this.http.get<Appointment[]>(`http://localhost:8080/api/appointments/patient/${patient.id}`, {
+            headers: {
+                'Custom-Auth': localStorage.getItem('userData') || ''
+            }
+        }).subscribe(
             appointments => {
                 this.patientAppointments = appointments;
             }
@@ -124,9 +194,7 @@ export class MedecinMainPageComponent {
 
         this.http.post('/api/vaccinations/validate', validationData).subscribe(
             response => {
-                // Gérer la réponse
                 console.log('Vaccination validée');
-                // Réinitialiser les champs
                 this.resetValidationForm();
             },
             error => {
@@ -136,7 +204,6 @@ export class MedecinMainPageComponent {
     }
 
     reportProblem() {
-        // Implémenter la logique pour signaler un problème
         console.log('Problème signalé');
     }
 
