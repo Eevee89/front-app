@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, PLATFORM_ID, Inject } from '@angular/core';
 import { Address } from '../../../models/address';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -13,10 +13,17 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { MatRadioModule } from '@angular/material/radio';
-import { firstValueFrom } from 'rxjs'; 
+import { firstValueFrom } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
+
+interface AuthResponse {
+  name: string;
+  privilegeLevel?: number;
+  isStaff: boolean;
+}
 
 @Component({
-  selector: 'app-customer-login-page',
+  selector: 'app-login-page',
   standalone: true,
   providers: [provideNativeDateAdapter()],
   imports: [
@@ -31,10 +38,10 @@ import { firstValueFrom } from 'rxjs';
     MatIconModule,
     MatDatepickerModule,
   ],
-  templateUrl: './customer-login-page.component.html',
-  styleUrl: './customer-login-page.component.css',
+  templateUrl: './login-page.component.html',
+  styleUrl: './login-page.component.css',
 })
-export class CustomerLoginPageComponent {
+export class LoginPageComponent {
   hide = signal(true);
   emailErrorMessage = signal('');
   phoneErrorMessage = signal('');
@@ -57,12 +64,18 @@ export class CustomerLoginPageComponent {
   readonly phone = new FormControl('', [Validators.required, Validators.maxLength(10)]);
   readonly confPassword = new FormControl('', [Validators.required]);
 
-  constructor(private router: Router, private _httpClient: HttpClient){}
+  constructor(
+    private router: Router, 
+    private _httpClient: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ){}
 
   private _snackBar = inject(MatSnackBar);
 
   async ngOnInit() {
-    localStorage.clear();
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.clear();
+    }
   }
 
   updateEmailErrorMessage() {
@@ -90,18 +103,41 @@ export class CustomerLoginPageComponent {
       let user = {
         email: this.email.value,
         password: this.password.value,
-        role: "USER"
+        role: "USER"  // On commence avec USER par défaut
       };
 
-      localStorage.setItem('userData', JSON.stringify(user));
-      let resp = JSON.stringify(await firstValueFrom(this._httpClient.get('/api/auth')));
-      resp = resp.substring(9);
-      const n = resp.length;
-      resp = resp.substring(0, n-2);
+      let resp = await firstValueFrom(this._httpClient.get<AuthResponse>('/api/auth', {
+        headers: {
+          'Custom-Auth': JSON.stringify(user)
+        }
+      }));
 
-      localStorage.setItem('userName', resp);
-
-      this.router.navigate(["customer/index"]);
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('userData', JSON.stringify(user));
+        localStorage.setItem('userName', resp.name);
+        
+        if (resp.isStaff && resp.privilegeLevel !== undefined) {
+          localStorage.setItem('privilegeLevel', resp.privilegeLevel.toString());
+          
+          // Redirection en fonction du niveau de privilège pour les staffs
+          switch (resp.privilegeLevel) {
+            case 0:
+              this.router.navigate(["/superadmin/index"]);
+              break;
+            case 1:
+              this.router.navigate(["/admin/index"]);
+              break;
+            case 2:
+              this.router.navigate(["/medecin/index"]);
+              break;
+            default:
+              this._snackBar.open('Niveau de privilège non reconnu', '', { duration: 3000 });
+          }
+        } else {
+          // Si ce n'est pas un staff, c'est un utilisateur normal
+          this.router.navigate(["/customer/index"]);
+        }
+      }
     } catch (error) {
       if (error instanceof HttpErrorResponse) {
         if (error.status === HttpStatusCode.Unauthorized) {
@@ -132,63 +168,52 @@ export class CustomerLoginPageComponent {
         );
       }
       else {
-        let user = {
-          email: this.email.value!,
-          password: this.password.value!,
-          role: "USER"
-        };
-
-        let toAddaddress: {
-          street: string;
-          zipCode: string;
-          city: string;
-        };
-        
-        toAddaddress = {
+        let addressToCreate = {
           street: this.street.value!,
           zipCode: this.zipCode.value!,
-          city: this.city.value!,
+          city: this.city.value!
         };
-
-        localStorage.setItem('userData', JSON.stringify(user));
         
-        let resp = JSON.stringify(await firstValueFrom(this._httpClient.post('/api/address/create', toAddaddress)));
-        resp = resp.substring(6);
-        const n = resp.length;
-        resp = resp.substring(0, n-1);
+        const addressResponse = await firstValueFrom(
+          this._httpClient.post<{id: number}>('/api/address/create', addressToCreate)
+        );
 
-        let address: Address = {
-          id: parseInt(resp),
-          street: toAddaddress.street,
-          city: toAddaddress.city,
-          zipCode: toAddaddress.zipCode
-        };
-
-        let patient = {
+        let patientToCreate = {
           firstName: this.firstName.value!, 
           lastName: this.lastName.value!, 
           gender: this.gender == "M", 
           email: this.email.value!, 
           phone: this.phone.value!,
           birthDate: new Date(this.birthDate.value ? this.birthDate.value : "01/01/1970"), 
-          address: address,
-          password: this.password.value!
+          address: {
+            id: addressResponse.id
+          },
+          password: this.password.value!,
+          vaccines: []
         };
 
-        localStorage.setItem('user', JSON.stringify(patient));
-        localStorage.setItem('userName', this.firstName.value!);
-        await firstValueFrom(this._httpClient.post('/api/patients/create', patient))
-  
-        this.router.navigate(["customer/index"]);
+        console.log('Patient à créer:', patientToCreate);
+
+        await firstValueFrom(this._httpClient.post('/api/patients/create', patientToCreate, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }));
+        
+        this.router.navigate(["/customer/index"]);
       }
     } catch (error) {
+      console.error('Erreur détaillée:', error);
       if (error instanceof HttpErrorResponse) {
+        let message = 'Une erreur est survenue lors de l\'inscription.';
         if (error.status === HttpStatusCode.Unauthorized) {
-          this._snackBar.open(
-            'Les informations fournies n\'ont pas permis de vous identifier.', undefined,
-            { duration: 3000 }
-          );
+          message = 'Les informations fournies n\'ont pas permis de vous identifier.';
+        } else if (error.status === HttpStatusCode.Conflict) {
+          message = 'Un compte existe déjà avec cet email.';
+        } else if (error.status === HttpStatusCode.InternalServerError) {
+          message = 'Erreur serveur: ' + (error.error?.message || 'Erreur inconnue');
         }
+        this._snackBar.open(message, undefined, { duration: 3000 });
       }
     }
   }

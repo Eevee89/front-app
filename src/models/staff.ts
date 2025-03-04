@@ -1,9 +1,8 @@
 export interface Staff {
     id: number;
+    privilege: number;
     firstName: string;
     lastName: string;
+    email: string;
     phone: string;
-    centerIds: number[];
-    privilege: number;
-    workTimeIds: number[];
 }

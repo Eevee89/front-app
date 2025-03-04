@@ -1,0 +1,145 @@
+<div class="admin-container">
+    <mat-toolbar color="primary">
+        <span>Espace Administrateur</span>
+    </mat-toolbar>
+
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="admin-tabs">
+        <!-- Gestion des médecins -->
+        <mat-tab label="Gestion des médecins">
+            <div class="tab-content">
+                <div class="search-section">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Rechercher un médecin</mat-label>
+                        <input matInput [(ngModel)]="searchMedecin" placeholder="Nom ou spécialité">
+                        <mat-icon matSuffix>search</mat-icon>
+                    </mat-form-field>
+                </div>
+
+                <div class="content-grid">
+                    <!-- Liste des médecins -->
+                    <div class="doctors-list">
+                        <mat-card>
+                            <mat-card-header>
+                                <mat-card-title>Liste des médecins</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <mat-list>
+                                    <mat-list-item *ngFor="let medecin of medecins" 
+                                                  (click)="selectMedecin(medecin)"
+                                                  [class.selected]="selectedMedecin?.id === medecin.id">
+                                        <mat-icon matListItemIcon>person</mat-icon>
+                                        <div matListItemTitle>Dr. {{medecin.lastName}} {{medecin.firstName}}</div>
+                                        
+                                    </mat-list-item>
+                                </mat-list>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+
+                    <!-- Détails du médecin -->
+                    <div class="doctor-details" *ngIf="selectedMedecin">
+                        <mat-card>
+                            <mat-card-header>
+                                <mat-card-title>Détails du médecin</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <strong>Nom:</strong>
+                                        <span>{{selectedMedecin.lastName}}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Prénom:</strong>
+                                        <span>{{selectedMedecin.firstName}}</span>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <strong>Email:</strong>
+                                        <span>{{selectedMedecin.email}}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Téléphone:</strong>
+                                        <span>{{selectedMedecin.phone}}</span>
+                                    </div>
+                                </div>
+                                <div class="action-buttons">
+                                    <button mat-raised-button color="primary" (click)="editMedecin(selectedMedecin)">
+                                        <mat-icon>edit</mat-icon>
+                                        Modifier
+                                    </button>
+                                    <button mat-raised-button color="warn" (click)="deleteMedecin(selectedMedecin.id)">
+                                        <mat-icon>delete</mat-icon>
+                                        Supprimer
+                                    </button>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+
+        <!-- Gestion des rendez-vous -->
+        <mat-tab label="Gestion des rendez-vous">
+            <div class="tab-content">
+                <div class="search-section">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Rechercher un patient</mat-label>
+                        <input matInput [(ngModel)]="searchPatient" placeholder="Nom du patient">
+                        <mat-icon matSuffix>search</mat-icon>
+                    </mat-form-field>
+                </div>
+
+                <mat-card>
+                    <mat-card-header>
+                        <mat-card-title>Liste des rendez-vous</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <table mat-table [dataSource]="appointments" class="appointments-table">
+                            <!-- Date Column -->
+                            <ng-container matColumnDef="date">
+                                <th mat-header-cell *matHeaderCellDef> Date </th>
+                                <td mat-cell *matCellDef="let appointment"> 
+                                    {{formatDate(appointment.date) | date:'dd/MM/yyyy HH:mm'}} 
+                                </td>
+                            </ng-container>
+
+                            <!-- Patient Column -->
+                            <ng-container matColumnDef="patient">
+                                <th mat-header-cell *matHeaderCellDef> Patient </th>
+                                <td mat-cell *matCellDef="let appointment">
+                                    {{appointment.patient.lastName}} {{appointment.patient.firstName}}
+                                </td>
+                            </ng-container>
+
+                            <!-- Médecin Column -->
+                            <ng-container matColumnDef="medecin">
+                                <th mat-header-cell *matHeaderCellDef> Médecin </th>
+                                <td mat-cell *matCellDef="let appointment">
+                                    Dr. {{appointment.medecin.lastName}} {{appointment.medecin.firstName}}
+                                </td>
+                            </ng-container>
+
+                            <!-- Actions Column -->
+                            <ng-container matColumnDef="actions">
+                                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                                <td mat-cell *matCellDef="let appointment">
+                                    <button mat-icon-button color="primary" (click)="viewAppointment(appointment)">
+                                        <mat-icon>visibility</mat-icon>
+                                    </button>
+                                    <button mat-icon-button color="warn" (click)="cancelAppointment(appointment.id)">
+                                        <mat-icon>cancel</mat-icon>
+                                    </button>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</div>
+

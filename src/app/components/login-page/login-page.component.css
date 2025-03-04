@@ -51,3 +51,14 @@ mat-radio-group {
         width: 50%;
     }
 }
+
+.user-type-selection {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.mat-radio-button {
+    margin: 0 10px;
+}
