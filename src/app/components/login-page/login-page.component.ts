@@ -100,53 +100,72 @@ export class LoginPageComponent {
 
   async loginClick() {
     try {
-      let user = {
-        email: this.email.value,
-        password: this.password.value,
-        role: "USER"  // On commence avec USER par défaut
-      };
+        // Essayer d'abord en tant que STAFF
+        let staffUser = {
+            email: this.email.value,
+            password: this.password.value,
+            role: "STAFF"
+        };
 
-      let resp = await firstValueFrom(this._httpClient.get<AuthResponse>('/api/auth', {
-        headers: {
-          'Custom-Auth': JSON.stringify(user)
-        }
-      }));
+        try {
+            let resp = await firstValueFrom(this._httpClient.get<AuthResponse>('/api/auth', {
+                headers: {
+                    'Custom-Auth': JSON.stringify(staffUser)
+                }
+            }));
 
-      if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('userData', JSON.stringify(user));
-        localStorage.setItem('userName', resp.name);
-        
-        if (resp.isStaff && resp.privilegeLevel !== undefined) {
-          localStorage.setItem('privilegeLevel', resp.privilegeLevel.toString());
-          
-          // Redirection en fonction du niveau de privilège pour les staffs
-          switch (resp.privilegeLevel) {
-            case 0:
-              this.router.navigate(["/superadmin/index"]);
-              break;
-            case 1:
-              this.router.navigate(["/admin/index"]);
-              break;
-            case 2:
-              this.router.navigate(["/medecin/index"]);
-              break;
-            default:
-              this._snackBar.open('Niveau de privilège non reconnu', '', { duration: 3000 });
-          }
-        } else {
-          // Si ce n'est pas un staff, c'est un utilisateur normal
-          this.router.navigate(["/customer/index"]);
+            if (isPlatformBrowser(this.platformId)) {
+                localStorage.setItem('userData', JSON.stringify(staffUser));
+                localStorage.setItem('userName', resp.name);
+                
+                if (resp.isStaff && resp.privilegeLevel !== undefined) {
+                    localStorage.setItem('privilegeLevel', resp.privilegeLevel.toString());
+                    
+                    switch (resp.privilegeLevel) {
+                        case 0:
+                            this.router.navigate(["/superadmin/index"]);
+                            break;
+                        case 1:
+                            this.router.navigate(["/admin/index"]);
+                            break;
+                        case 2:
+                            this.router.navigate(["/medecin/index"]);
+                            break;
+                        default:
+                            this._snackBar.open('Niveau de privilège non reconnu', '', { duration: 3000 });
+                    }
+                }
+                return; // Si la connexion staff réussit, on sort
+            }
+        } catch {
+            // Si échec en tant que STAFF, on essaie en tant que USER
+            let userUser = {
+                email: this.email.value,
+                password: this.password.value,
+                role: "USER"
+            };
+
+            let resp = await firstValueFrom(this._httpClient.get<AuthResponse>('/api/auth', {
+                headers: {
+                    'Custom-Auth': JSON.stringify(userUser)
+                }
+            }));
+
+            if (isPlatformBrowser(this.platformId)) {
+                localStorage.setItem('userData', JSON.stringify(userUser));
+                localStorage.setItem('userName', resp.name);
+                this.router.navigate(["/customer/index"]);
+            }
         }
-      }
     } catch (error) {
-      if (error instanceof HttpErrorResponse) {
-        if (error.status === HttpStatusCode.Unauthorized) {
-          this._snackBar.open(
-            'Les informations fournies n\'ont pas permis de vous identifier.', '',
-            { duration: 3000 }
-          );
+        if (error instanceof HttpErrorResponse) {
+            if (error.status === HttpStatusCode.Unauthorized) {
+                this._snackBar.open(
+                    'Les informations fournies n\'ont pas permis de vous identifier.', '',
+                    { duration: 3000 }
+                );
+            }
         }
-      }
     }
   }
 
