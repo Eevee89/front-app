@@ -106,3 +106,36 @@ mat-card {
 mat-card-content {
     padding: 15px;
 }
+
+.search-section {
+    padding: 20px;
+}
+
+.full-width {
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-results {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.patient-details {
+    margin-top: 20px;
+}
+
+.info-group {
+    margin-bottom: 20px;
+}
+
+.info-group p {
+    margin: 8px 0;
+}
+
+.appointments-list {
+    margin-top: 20px;
+}

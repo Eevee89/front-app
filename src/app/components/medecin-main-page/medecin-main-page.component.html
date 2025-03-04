@@ -7,33 +7,46 @@
         <mat-tab label="Recherche Patient">
             <div class="search-section">
                 <h3>Recherche d'un patient à l'arrivée</h3>
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Rechercher un patient</mat-label>
-                    <input matInput placeholder="Nom du patient">
+                    <input matInput [formControl]="searchControl" placeholder="Nom du patient">
                     <mat-icon matSuffix>search</mat-icon>
                 </mat-form-field>
 
+                <!-- Liste des résultats de recherche -->
+                <mat-selection-list *ngIf="filteredPatients.length > 0" class="search-results">
+                    <mat-list-option *ngFor="let patient of filteredPatients" 
+                                   (click)="selectPatient(patient)">
+                        {{ patient.lastName }} {{ patient.firstName }}
+                    </mat-list-option>
+                </mat-selection-list>
+
+                <!-- Détails du patient sélectionné -->
                 <div class="patient-details" *ngIf="selectedPatient">
                     <mat-card>
                         <mat-card-content>
                             <h4>Informations du patient</h4>
                             <div class="info-group">
-                                <p><strong>Nom :</strong> </p>
-                                <p><strong>Prénom :</strong></p>
-                                <p><strong>Date de naissance :</strong> </p>
-                                <p><strong>Téléphone :</strong></p>
+                                <p><strong>Nom :</strong> {{selectedPatient.lastName}}</p>
+                                <p><strong>Prénom :</strong> {{selectedPatient.firstName}}</p>
+                                <p><strong>Date de naissance :</strong> {{selectedPatient.birthDate | date:'dd/MM/yyyy'}}</p>
+                                <p><strong>Téléphone :</strong> {{selectedPatient.phone}}</p>
+                                <p><strong>Email :</strong> {{selectedPatient.email}}</p>
                             </div>
 
-                            <div class="appointment-info">
-                                <h4>Rendez-vous prévu</h4>
-                                <p><strong>Date :</strong></p>
-                                <p><strong>Heure :</strong> </p>
-                                <p><strong>Type de vaccination :</strong> </p>
+                            <div class="appointments-list">
+                                <h4>Rendez-vous</h4>
+                                <mat-list>
+                                    <mat-list-item *ngFor="let appointment of patientAppointments">
+                                        <div matListItemTitle>
+                                            {{appointment.time | date:'dd/MM/yyyy HH:mm'}}
+                                        </div>
+                                        <div matListItemLine>
+                                            Centre: {{appointment.centerId.name}}
+                                        </div>
+                                    </mat-list-item>
+                                </mat-list>
                             </div>
-
-                            <button mat-raised-button color="primary">
-                                Confirmer l'arrivée
-                            </button>
                         </mat-card-content>
                     </mat-card>
                 </div>
@@ -43,36 +56,44 @@
         <mat-tab label="Validation Vaccination">
             <div class="validation-section">
                 <h3>Validation des vaccinations</h3>
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Rechercher un patient</mat-label>
-                    <input matInput placeholder="Nom du patient">
+                    <input matInput [formControl]="validationSearchControl" placeholder="Nom du patient">
                     <mat-icon matSuffix>search</mat-icon>
                 </mat-form-field>
 
-                <div class="vaccination-details" *ngIf="selectedPatient">
+                <!-- Liste des résultats de recherche -->
+                <mat-selection-list *ngIf="filteredPatientsValidation.length > 0" class="search-results">
+                    <mat-list-option *ngFor="let patient of filteredPatientsValidation" 
+                                   (click)="selectPatientForValidation(patient)">
+                        {{ patient.lastName }} {{ patient.firstName }}
+                    </mat-list-option>
+                </mat-selection-list>
+
+                <div class="vaccination-details" *ngIf="selectedPatientValidation">
                     <mat-card>
                         <mat-card-content>
                             <h4>Validation de la vaccination</h4>
                             <div class="info-group">
-                                <p><strong>Patient :</strong> </p>
-                                <p><strong>Vaccin administré :</strong> </p>
+                                <p><strong>Patient :</strong> {{selectedPatientValidation.lastName}} {{selectedPatientValidation.firstName}}</p>
+                                <p><strong>Date de naissance :</strong> {{selectedPatientValidation.birthDate | date:'dd/MM/yyyy'}}</p>
                                 
                                 <mat-form-field appearance="outline">
                                     <mat-label>Numéro de lot du vaccin</mat-label>
-                                    <input matInput>
+                                    <input matInput [formControl]="lotNumberControl">
                                 </mat-form-field>
 
                                 <mat-form-field appearance="outline">
                                     <mat-label>Commentaires</mat-label>
-                                    <textarea matInput rows="4"></textarea>
+                                    <textarea matInput rows="4" [formControl]="commentsControl"></textarea>
                                 </mat-form-field>
                             </div>
 
                             <div class="action-buttons">
-                                <button mat-raised-button color="primary">
+                                <button mat-raised-button color="primary" (click)="validateVaccination()">
                                     Valider la vaccination
                                 </button>
-                                <button mat-raised-button color="warn">
+                                <button mat-raised-button color="warn" (click)="reportProblem()">
                                     Signaler un problème
                                 </button>
                             </div>

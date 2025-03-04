@@ -149,12 +149,11 @@ export class CustomerMainPageComponent {
   async book() {
     let doctor: Staff = {
       id: 0,
+      privilege: 0,
       firstName: "",
       lastName: "",
+      email: "",
       phone: "",
-      centerIds: [],
-      privilege: 0,
-      workTimeIds: []
     };
     let patient: Patient = {
       id: 0,
