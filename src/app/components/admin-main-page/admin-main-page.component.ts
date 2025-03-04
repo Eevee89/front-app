@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
 import { Patient } from '../../../models/patient';
 import { Appointment } from '../../../models/appointment';
 import { CommonModule } from '@angular/common';
@@ -11,11 +11,14 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Staff } from '../../../models/staff';
 import { Center } from '../../../models/center';
 import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
+import { FormControl } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
     selector: 'app-admin-main-page',
@@ -33,7 +36,8 @@ import { HttpClient } from '@angular/common/http';
         MatTableModule,
         MatButtonModule,
         MatListModule,
-        FormsModule
+        FormsModule,
+        ReactiveFormsModule
     ]
 })
 export class AdminMainPageComponent implements OnInit {
@@ -48,15 +52,61 @@ export class AdminMainPageComponent implements OnInit {
     searchMedecin: string = '';
     searchPatient: string = '';
     displayedColumns: string[] = ['date', 'patient', 'medecin', 'actions'];
+    searchControl: FormControl = new FormControl('');
+    patientSearchControl: FormControl = new FormControl('');
+    filteredPatients: Patient[] = [];
+    selectedPatientAppointments: Appointment[] = [];
 
     constructor(
         private http: HttpClient,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        @Inject(PLATFORM_ID) private platformId: Object
     ) {}
 
     ngOnInit() {
-        this.loadMedecins();
-        this.loadAppointments();
+        if (isPlatformBrowser(this.platformId)) {
+            const userData = localStorage.getItem('userData');
+            if (!userData) {
+                console.error("Aucune donnée d'authentification trouvée");
+                return;
+            }
+
+            this.http.get<Staff[]>('http://localhost:8080/api/staff/doctors', {
+                headers: {
+                    'Custom-Auth': userData,
+                    'Content-Type': 'application/json'
+                }
+            }).subscribe({
+                next: (response) => {
+                    this.medecins = response;
+                },
+                error: (error) => {
+                    console.error('Erreur lors du chargement des médecins:', error);
+                }
+            });
+        }
+
+        this.searchControl.valueChanges
+            .pipe(
+                debounceTime(300),
+                distinctUntilChanged()
+            )
+            .subscribe(value => {
+                if (value) {
+                    this.searchMedecins(value);
+                }
+            });
+
+        this.patientSearchControl.valueChanges
+            .pipe(
+                debounceTime(300),
+                distinctUntilChanged()
+            )
+            .subscribe(value => {
+                if (value) {
+                    this.searchPatients(value);
+                }
+            });
     }
 
     loadMedecins() {
@@ -126,5 +176,132 @@ export class AdminMainPageComponent implements OnInit {
 
     formatDate(date: string): Date {
         return new Date(date);
+    }
+
+    searchMedecins(value: string) {
+        const searchValue = value.trim().toLowerCase();
+        if (!searchValue) {
+            this.medecins = [];
+            return;
+        }
+
+        if (isPlatformBrowser(this.platformId)) {
+            const userData = localStorage.getItem('userData');
+            if (!userData) {
+                console.error("Aucune donnée d'authentification trouvée");
+                return;
+            }
+
+            this.http.get<Staff[]>(`http://localhost:8080/api/staff/doctors/search`, {
+                params: { 
+                    email: searchValue
+                },
+                headers: {
+                    'Custom-Auth': userData,
+                    'Content-Type': 'application/json'
+                }
+            }).subscribe({
+                next: (data) => {
+                    this.medecins = data;
+                    console.log("Médecins trouvés :", this.medecins);
+                },
+                error: (error) => {
+                    console.error("Erreur de recherche :", error);
+                    if (error.status === 401) {
+                        console.log("Problème d'authentification");
+                    }
+                    this.medecins = [];
+                }
+            });
+        }
+    }
+
+    searchPatients(value: string) {
+        const searchValue = value.trim().toLowerCase();
+        if (!searchValue) {
+            this.filteredPatients = [];
+            return;
+        }
+
+        if (isPlatformBrowser(this.platformId)) {
+            const userData = localStorage.getItem('userData');
+            if (!userData) {
+                console.error("Aucune donnée d'authentification trouvée");
+                return;
+            }
+
+            this.http.get<Patient[]>(`http://localhost:8080/api/patients/search`, {
+                params: { 
+                    email: searchValue
+                },
+                headers: {
+                    'Custom-Auth': userData,
+                    'Content-Type': 'application/json'
+                }
+            }).subscribe({
+                next: (data) => {
+                    this.filteredPatients = data;
+                },
+                error: (error) => {
+                    console.error("Erreur de recherche :", error);
+                    this.filteredPatients = [];
+                }
+            });
+        }
+    }
+
+    selectPatient(patient: Patient) {
+        this.selectedPatient = patient;
+        if (isPlatformBrowser(this.platformId)) {
+            const userData = localStorage.getItem('userData');
+            if (!userData) {
+                console.error("Aucune donnée d'authentification trouvée");
+                return;
+            }
+
+            this.http.get<Appointment[]>(`http://localhost:8080/api/appointments/patient/${patient.id}`, {
+                headers: {
+                    'Custom-Auth': userData,
+                    'Content-Type': 'application/json'
+                }
+            }).subscribe({
+                next: (appointments) => {
+                    this.selectedPatientAppointments = appointments;
+                },
+                error: (error) => {
+                    console.error("Erreur lors du chargement des rendez-vous:", error);
+                    this.selectedPatientAppointments = [];
+                }
+            });
+        }
+    }
+
+    modifyAppointment(appointment: Appointment) {
+        // TODO: Implémenter la modification (peut-être avec un dialog)
+    }
+
+    deleteAppointment(appointmentId: number) {
+        if (isPlatformBrowser(this.platformId)) {
+            const userData = localStorage.getItem('userData');
+            if (!userData) {
+                console.error("Aucune donnée d'authentification trouvée");
+                return;
+            }
+
+            this.http.delete(`http://localhost:8080/api/appointments/${appointmentId}`, {
+                headers: {
+                    'Custom-Auth': userData,
+                    'Content-Type': 'application/json'
+                }
+            }).subscribe({
+                next: () => {
+                    this.selectedPatientAppointments = this.selectedPatientAppointments
+                        .filter(a => a.id !== appointmentId);
+                },
+                error: (error) => {
+                    console.error("Erreur lors de la suppression:", error);
+                }
+            });
+        }
     }
 }

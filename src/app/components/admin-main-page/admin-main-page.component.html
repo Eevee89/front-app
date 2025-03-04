@@ -10,7 +10,7 @@
                 <div class="search-section">
                     <mat-form-field appearance="outline">
                         <mat-label>Rechercher un médecin</mat-label>
-                        <input matInput [(ngModel)]="searchMedecin" placeholder="Nom ou spécialité">
+                        <input matInput [formControl]="searchControl" placeholder="Email du médecin">
                         <mat-icon matSuffix>search</mat-icon>
                     </mat-form-field>
                 </div>
@@ -85,59 +85,105 @@
                 <div class="search-section">
                     <mat-form-field appearance="outline">
                         <mat-label>Rechercher un patient</mat-label>
-                        <input matInput [(ngModel)]="searchPatient" placeholder="Nom du patient">
+                        <input matInput [formControl]="patientSearchControl" placeholder="Email du patient">
                         <mat-icon matSuffix>search</mat-icon>
                     </mat-form-field>
                 </div>
 
-                <mat-card>
-                    <mat-card-header>
-                        <mat-card-title>Liste des rendez-vous</mat-card-title>
-                    </mat-card-header>
-                    <mat-card-content>
-                        <table mat-table [dataSource]="appointments" class="appointments-table">
-                            <!-- Date Column -->
-                            <ng-container matColumnDef="date">
-                                <th mat-header-cell *matHeaderCellDef> Date </th>
-                                <td mat-cell *matCellDef="let appointment"> 
-                                    {{formatDate(appointment.date) | date:'dd/MM/yyyy HH:mm'}} 
-                                </td>
-                            </ng-container>
+                <div class="content-grid">
+                    <!-- Liste des patients -->
+                    <div class="patients-list">
+                        <mat-card>
+                            <mat-card-header>
+                                <mat-card-title>Liste des patients</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <mat-list>
+                                    <mat-list-item *ngFor="let patient of filteredPatients" 
+                                                  (click)="selectPatient(patient)"
+                                                  [class.selected]="selectedPatient?.id === patient.id">
+                                        <mat-icon matListItemIcon>person</mat-icon>
+                                        <div matListItemTitle>{{patient.lastName}} {{patient.firstName}}</div>
+                                        <div matListItemLine>{{patient.email}}</div>
+                                    </mat-list-item>
+                                </mat-list>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
 
-                            <!-- Patient Column -->
-                            <ng-container matColumnDef="patient">
-                                <th mat-header-cell *matHeaderCellDef> Patient </th>
-                                <td mat-cell *matCellDef="let appointment">
-                                    {{appointment.patient.lastName}} {{appointment.patient.firstName}}
-                                </td>
-                            </ng-container>
+                    <!-- Détails du patient et ses rendez-vous -->
+                    <div class="patient-details" *ngIf="selectedPatient">
+                        <mat-card>
+                            <mat-card-header>
+                                <mat-card-title>Détails du patient</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <strong>Nom:</strong>
+                                        <span>{{selectedPatient.lastName}}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Prénom:</strong>
+                                        <span>{{selectedPatient.firstName}}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Email:</strong>
+                                        <span>{{selectedPatient.email}}</span>
+                                    </div>
+                                </div>
 
-                            <!-- Médecin Column -->
-                            <ng-container matColumnDef="medecin">
-                                <th mat-header-cell *matHeaderCellDef> Médecin </th>
-                                <td mat-cell *matCellDef="let appointment">
-                                    Dr. {{appointment.medecin.lastName}} {{appointment.medecin.firstName}}
-                                </td>
-                            </ng-container>
+                                <!-- Liste des rendez-vous -->
+                                <div class="appointments-section">
+                                    <h3>Rendez-vous</h3>
+                                    <table mat-table [dataSource]="selectedPatientAppointments" class="mat-elevation-z8">
+                                        <!-- Date Column -->
+                                        <ng-container matColumnDef="date">
+                                            <th mat-header-cell *matHeaderCellDef>Date</th>
+                                            <td mat-cell *matCellDef="let appointment">
+                                                {{formatDate(appointment.date) | date:'dd/MM/yyyy HH:mm'}}
+                                            </td>
+                                        </ng-container>
 
-                            <!-- Actions Column -->
-                            <ng-container matColumnDef="actions">
-                                <th mat-header-cell *matHeaderCellDef> Actions </th>
-                                <td mat-cell *matCellDef="let appointment">
-                                    <button mat-icon-button color="primary" (click)="viewAppointment(appointment)">
-                                        <mat-icon>visibility</mat-icon>
-                                    </button>
-                                    <button mat-icon-button color="warn" (click)="cancelAppointment(appointment.id)">
-                                        <mat-icon>cancel</mat-icon>
-                                    </button>
-                                </td>
-                            </ng-container>
+                                        <!-- Médecin Column -->
+                                        <ng-container matColumnDef="medecin">
+                                            <th mat-header-cell *matHeaderCellDef>Médecin</th>
+                                            <td mat-cell *matCellDef="let appointment">
+                                                Dr. {{appointment.medecin.lastName}} {{appointment.medecin.firstName}}
+                                            </td>
+                                        </ng-container>
 
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                        </table>
-                    </mat-card-content>
-                </mat-card>
+                                        <!-- Centre Column -->
+                                        <ng-container matColumnDef="center">
+                                            <th mat-header-cell *matHeaderCellDef>Centre</th>
+                                            <td mat-cell *matCellDef="let appointment">
+                                                {{appointment.center.name}}
+                                            </td>
+                                        </ng-container>
+
+                                        <!-- Actions Column -->
+                                        <ng-container matColumnDef="actions">
+                                            <th mat-header-cell *matHeaderCellDef>Actions</th>
+                                            <td mat-cell *matCellDef="let appointment">
+                                                <button mat-icon-button color="primary" 
+                                                        (click)="modifyAppointment(appointment)">
+                                                    <mat-icon>edit</mat-icon>
+                                                </button>
+                                                <button mat-icon-button color="warn" 
+                                                        (click)="deleteAppointment(appointment.id)">
+                                                    <mat-icon>delete</mat-icon>
+                                                </button>
+                                            </td>
+                                        </ng-container>
+
+                                        <tr mat-header-row *matHeaderRowDef="['date', 'medecin', 'center', 'actions']"></tr>
+                                        <tr mat-row *matRowDef="let row; columns: ['date', 'medecin', 'center', 'actions'];"></tr>
+                                    </table>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                </div>
             </div>
         </mat-tab>
     </mat-tab-group>
