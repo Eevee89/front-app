@@ -70,33 +70,46 @@ export class MedecinMainPageComponent implements OnInit {
     ngOnInit() {
         let userData = '';
         if (isPlatformBrowser(this.platformId)) {
-            const rawUserData = localStorage.getItem('userData') || '{}';
-            const parsedUserData = JSON.parse(rawUserData);
-            // Forcer le rôle STAFF indépendamment de ce qui est stocké
-            parsedUserData.role = "STAFF";
-            userData = JSON.stringify(parsedUserData);
-            // Mettre à jour le localStorage avec le nouveau rôle
-            localStorage.setItem('userData', userData);
-            console.log('Données envoyées:', userData);
+            // Récupérer les données d'authentification existantes
+            const rawUserData = localStorage.getItem('userData');
+            if (!rawUserData) {
+                console.error("Aucune donnée d'authentification trouvée");
+                return;
+            }
+
+            try {
+                const parsedUserData = JSON.parse(rawUserData);
+                // S'assurer que c'est un staff
+                if (!parsedUserData.role || parsedUserData.role !== "STAFF") {
+                    parsedUserData.role = "STAFF";
+                    localStorage.setItem('userData', JSON.stringify(parsedUserData));
+                }
+                userData = JSON.stringify(parsedUserData);
+
+                // Faire la requête pour obtenir les patients
+                this.http.get<Patient[]>('http://localhost:8080/api/patients', {
+                    headers: {
+                        'Custom-Auth': userData,
+                        'Content-Type': 'application/json'
+                    }
+                }).subscribe({
+                    next: (data) => {
+                        this.patients = data;
+                        console.log("Patients chargés :", this.patients);
+                    },
+                    error: (error) => {
+                        console.error("Erreur détaillée:", error);
+                        if (error.status === 401) {
+                            console.log("Données d'authentification:", userData);
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Erreur lors du parsing des données d'authentification:", error);
+            }
         }
         
-        this.http.get<Patient[]>('http://localhost:8080/api/patient', {
-            headers: {
-                'Custom-Auth': userData
-            }
-        }).subscribe(
-            data => {
-                this.patients = data;
-                console.log("Patients chargés :", this.patients);
-            },
-            error => {
-                console.error("Erreur détaillée:", error);
-                if (error.status === 401) {
-                    console.log("Données d'authentification:", userData);
-                }
-            }
-        );
-
         // Écouter les changements dans le champ de recherche
         this.searchControl.valueChanges.subscribe(value => {
             if (value && value.length >= 2) {
@@ -123,22 +136,33 @@ export class MedecinMainPageComponent implements OnInit {
             return;
         }
 
-        // Appeler l'API de recherche au lieu de filtrer localement
-        this.http.get<Patient[]>(`http://localhost:8080/api/search`, {
-            params: { name: [searchValue] },
+        const userData = localStorage.getItem('userData');
+        if (!userData) {
+            console.error("Aucune donnée d'authentification trouvée");
+            return;
+        }
+
+        this.http.get<Patient[]>(`http://localhost:8080/api/patients/search`, {
+            params: { 
+                email: searchValue
+            },
             headers: {
-                'Custom-Auth': localStorage.getItem('userData') || ''
+                'Custom-Auth': userData,
+                'Content-Type': 'application/json'
             }
-        }).subscribe(
-            data => {
+        }).subscribe({
+            next: (data) => {
                 this.filteredPatients = data;
                 console.log("Patients trouvés :", this.filteredPatients);
             },
-            error => {
+            error: (error) => {
                 console.error("Erreur de recherche :", error);
+                if (error.status === 401) {
+                    console.log("Données d'authentification:", userData);
+                }
                 this.filteredPatients = [];
             }
-        );
+        });
     }
 
     searchPatientsForValidation(value: string) {
@@ -148,21 +172,34 @@ export class MedecinMainPageComponent implements OnInit {
             return;
         }
 
-        // Utiliser la même API de recherche
-        this.http.get<Patient[]>(`http://localhost:8080/api/search`, {
-            params: { name: [searchValue] },
-            headers: {
-                'Custom-Auth': localStorage.getItem('userData') || ''
-            }
-        }).subscribe(
-            data => {
-                this.filteredPatientsValidation = data;
+        const userData = localStorage.getItem('userData');
+        if (!userData) {
+            console.error("Aucune donnée d'authentification trouvée");
+            return;
+        }
+
+        // Utiliser la même API de recherche avec email
+        this.http.get<Patient[]>(`http://localhost:8080/api/patients/search`, {
+            params: { 
+                email: searchValue
             },
-            error => {
+            headers: {
+                'Custom-Auth': userData,
+                'Content-Type': 'application/json'
+            }
+        }).subscribe({
+            next: (data) => {
+                this.filteredPatientsValidation = data;
+                console.log("Patients trouvés pour validation:", this.filteredPatientsValidation);
+            },
+            error: (error) => {
                 console.error("Erreur de recherche :", error);
+                if (error.status === 401) {
+                    console.log("Données d'authentification:", userData);
+                }
                 this.filteredPatientsValidation = [];
             }
-        );
+        });
     }
 
     selectPatient(patient: Patient) {

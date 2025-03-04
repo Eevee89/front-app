@@ -197,10 +197,14 @@ export class CustomerMainPageComponent {
     date.setMinutes(this.mins);
 
     let app: Appointment = {
-      patientId: patient,
-      centerId: this.selectedCenter,
-      doctorId: doctor,
-      time: date
+      patient: patient,
+      medecin: doctor,
+      center: {
+        id: this.selectedCenter.id,
+        name: this.selectedCenter.name
+      },
+      date: date.toISOString(),
+      id: 0
     }
 
     try {

@@ -1,67 +1,149 @@
-<div id="main">
+<div class="superadmin-container">
     <mat-toolbar color="primary">
         <span>Super Administrateur</span>
     </mat-toolbar>
 
     <mat-tab-group [(selectedIndex)]="selectedTabIndex">
         <mat-tab label="Gestion des centres">
-            <mat-form-field appearance="outline">
-                <mat-label>Rechercher un centre</mat-label>
-                <input matInput placeholder="Nom du centre">
-                <mat-icon matSuffix>search</mat-icon>
-            </mat-form-field>
+            <div class="tab-content">
+                <div class="search-section">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Rechercher un centre</mat-label>
+                        <input matInput [formControl]="searchControl" placeholder="Nom ou ville du centre">
+                        <mat-icon matSuffix>search</mat-icon>
+                    </mat-form-field>
+                </div>
 
-            <mat-tab-group>
-                <mat-tab label="Informations centre">
-                    <div id="selectedCenterInfo">
-                        <span>Centre sélectionné<br></span>
-                        <span>Nom du centre : <br></span>
-                        <span>Adresse : <br></span>
-                        <span>Ville : <br></span>
-                        <span>Code postal : <br></span>
-                        <span>Téléphone : <br></span>
-                        <span>Email : <br></span>
+                <div class="content-grid">
+                    <!-- Liste des centres -->
+                    <div class="centers-list">
+                        <mat-card>
+                            <mat-card-header>
+                                <mat-card-title>Liste des centres</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <mat-list>
+                                    <mat-list-item *ngFor="let center of centers" 
+                                                  (click)="selectCenter(center)"
+                                                  [class.selected]="selectedCenter?.id === center.id">
+                                        <mat-icon matListItemIcon>business</mat-icon>
+                                        <div matListItemTitle>{{center.name}}</div>
+                                        <div matListItemLine>{{center.address.city}}</div>
+                                    </mat-list-item>
+                                </mat-list>
+                            </mat-card-content>
+                        </mat-card>
                     </div>
-                </mat-tab>
-                
-                <mat-tab label="Liste des médecins">
-                    <div id="centerDoctorsList">
-                        <span>Médecins du centre<br></span>
-                        <!-- Liste des médecins ici -->
+
+                    <!-- Détails du centre et ses médecins -->
+                    <div class="center-details" *ngIf="selectedCenter">
+                        <mat-tab-group>
+                            <!-- Informations du centre -->
+                            <mat-tab label="Informations">
+                                <mat-card>
+                                    <mat-card-header>
+                                        <mat-card-title>{{selectedCenter.name}}</mat-card-title>
+                                    </mat-card-header>
+                                    <mat-card-content>
+                                        <div class="info-grid">
+                                            <div class="info-item">
+                                                <strong>Adresse:</strong>
+                                                <span>{{selectedCenter.address.street}}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <strong>Ville:</strong>
+                                                <span>{{selectedCenter.address.city}}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <strong>Code postal:</strong>
+                                                <span>{{selectedCenter.address.zipCode}}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <strong>Téléphone:</strong>
+                                                <span>{{selectedCenter.phone}}</span>
+                                            </div>
+                                        </div>
+                                    </mat-card-content>
+                                </mat-card>
+                            </mat-tab>
+
+                            <!-- Liste des médecins -->
+                            <mat-tab label="Médecins">
+                                <mat-card>
+                                    <mat-card-header>
+                                        <mat-card-title>Médecins du centre</mat-card-title>
+                                    </mat-card-header>
+                                    <mat-card-content>
+                                        <mat-list>
+                                            <mat-list-item *ngFor="let doctor of centerDoctors">
+                                                <mat-icon matListItemIcon>person</mat-icon>
+                                                <div matListItemTitle>Dr. {{doctor.lastName}} {{doctor.firstName}}</div>
+                                                <div matListItemLine>{{doctor.email}}</div>
+                                            </mat-list-item>
+                                        </mat-list>
+                                    </mat-card-content>
+                                </mat-card>
+                            </mat-tab>
+                        </mat-tab-group>
                     </div>
-                </mat-tab>
-            </mat-tab-group>
+                </div>
+            </div>
         </mat-tab>
 
-        <mat-tab label="Gestion des administrateurs">
-            <div id="adminInfo"> 
-                <h3>Gestion des administrateurs</h3>
-                
-                <mat-form-field appearance="outline">
-                    <mat-label>Rechercher un administrateur</mat-label>
-                    <input matInput placeholder="Nom de l'administrateur">
-                    <mat-icon matSuffix>search</mat-icon>
+        <mat-tab label="Administrateurs">
+            <div class="search-container">
+                <mat-form-field>
+                    <input matInput placeholder="Rechercher un administrateur" 
+                           #searchInput
+                           (keyup)="searchAdmins(searchInput.value)">
                 </mat-form-field>
+            </div>
 
-                <div class="admin-details" *ngIf="selectedAdmin">
-                    <h4>Détails de l'administrateur</h4>
+            <div class="admins-list">
+                <div *ngFor="let admin of admins">
                     <mat-card>
                         <mat-card-content>
-                            <div class="info-group">
-                                <h5>Informations personnelles</h5>
-                                <p>Nom : </p>
-                                <p>Prénom : </p>
-                                <p>Email : </p>
-                                <p>Téléphone :</p>
+                            <!-- Mode affichage -->
+                            <div *ngIf="admin.id !== editingAdminId">
+                                <div class="admin-info">
+                                    <p>{{admin.firstName}} {{admin.lastName}}</p>
+                                    <p>{{admin.email}}</p>
+                                    <p>{{admin.phone}}</p>
+                                </div>
+                                <div class="admin-actions">
+                                    <button mat-icon-button color="primary" (click)="startEditing(admin)">
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                </div>
                             </div>
 
-                            <div class="info-group">
-                                <h5>Centre médical géré</h5>
-                                <p>Nom du centre :</p>
-                                <p>Adresse :</p>
-                                <p>Ville :</p>
-                                <p>Code postal : </p>
-                            </div>
+                            <!-- Mode édition -->
+                            <form *ngIf="admin.id === editingAdminId" [formGroup]="adminForm" (ngSubmit)="saveAdmin(admin.id)">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Prénom</mat-label>
+                                    <input matInput formControlName="firstName">
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Nom</mat-label>
+                                    <input matInput formControlName="lastName">
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Email</mat-label>
+                                    <input matInput formControlName="email">
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Téléphone</mat-label>
+                                    <input matInput formControlName="phone">
+                                </mat-form-field>
+
+                                <div class="form-actions">
+                                    <button mat-button type="button" (click)="cancelEditing()">Annuler</button>
+                                    <button mat-raised-button color="primary" type="submit">Enregistrer</button>
+                                </div>
+                            </form>
                         </mat-card-content>
                     </mat-card>
                 </div>
